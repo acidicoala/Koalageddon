@@ -1,0 +1,84 @@
+{
+	"config_version": 1, // DO NOT EDIT THIS VALUE
+	"log_level": "debug",
+	"platforms": {
+		"Steam": {
+			"enabled": true,
+			"process": "steam.exe",
+			"replicate": true,
+			"ignore": [
+				"x86launcher.exe",
+				"x64launcher.exe",
+				"SteamService.exe",
+				"steamwebhelper.exe",
+				"GameOverlayUI.exe",
+				"gldriverquery.exe",
+				"gldriverquery64.exe",
+				"vulkandriverquery.exe",
+				"vulkandriverquery64.exe"
+			],
+			"blacklist": [ // Get App ID from SteamDB
+				"22618", // Alien Breed: Impact - PL Check [Do not force polish language]
+				"67379" // Darkness II Low Violence [Do not censor violence]
+			]
+		},
+		"Epic Games": {
+			"enabled": true,
+			"process": "EpicGamesLauncher.exe",
+			"replicate": true,
+			"ignore": [
+				"EpicWebHelper.exe",
+				"EpicOnlineServicesHost.exe",
+				"EpicOnlineServicesUserHelper.exe",
+				"UnrealCEFSubProcess.exe"
+			],
+			"blacklist": [ // Get DLC ID from ScreamDB
+				"ffffffffffffffffffffffffffffffff" // A Total War Sage: TROY [It actually asks this ID...]
+			]
+		},
+		"Origin": {
+			"enabled": true,
+			"process": "Origin.exe",
+			"replicate": false,
+			"ignore": [],
+			"blacklist": [ // Use ItemId from Unlocker32.Origin.log
+				// "SIMS4.OFF.SOLP.0x0000000000030553" // Sims 4: Get Famous [Better stay anonymous]
+			]
+		},
+		"Ubisoft Connect": {
+			"enabled": false, // Ubisoft games unload the Unlocker DLL :(
+			"process": "upc.exe",
+			"replicate": true,
+			"ignore": [
+				"UplayService.exe",
+				"UplayWebCore.exe"
+			],
+			"blacklist": []
+		}
+	},
+	"ignore": [
+		// Do not inject our own injector
+		"Injector32.exe",
+		"Injector64.exe",
+		// System
+		"reg.exe",
+		"cmd.exe",
+		"regsvr32.exe",
+		// Unreal Engine
+		"CrashReportClient.exe",
+		// Origin integration with other stores
+		"EALink.exe",
+		// Ubisoft integration with other stores
+		"UbisoftGameLauncher.exe",
+		"UbisoftGameLauncher64.exe"
+	],
+	"terminate": [
+		// Steam
+		"steamerrorreporter.exe",
+		// Origin
+		"OriginER.exe",
+		"OriginCrashReporter.exe",
+		// Ubisoft
+		"UplayCrashReporter.exe"
+	]
+}
