@@ -6,7 +6,7 @@
 #define MyAppPublisher "acidicoala"
 #define MyAppURL "https://github.com/acidicoala/Koalageddon"
 #define MyAppExeName "IntegrationWizard32.exe"
-#define MyOutputFileName "Koalageddon Installer"
+#define MyOutputFileName "KoalageddonInstaller"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.

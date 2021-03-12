@@ -1,11 +1,11 @@
 ﻿# 🐨 Koalageddon 💥
 #### Legit DLC Unlocker for Steam, Epic & Origin
 Welcome to the DreamAPI repository.
-For user-friendly introduction or support, please check out the official forum thread. This document is meant for software developers.
+For user-friendly introduction or support, please check out the [official forum thread]. This document is meant for software developers.
 
 ## 🗜 Solution Projects
 #### 🧰 Common
-This project is a static library that houses common functions of all other projects. For example, all projects need to access config file and loggin utilites, so they are defined in this module.
+This project is a static library that houses common functions of all other projects. For example, all projects need to access config file and logging utilites, so they are defined in this module.
 
 #### 💉 Injector
 This project is a simple DLL injector executable. The injector can be used as a command line utility that accepts 2 arguments: ID of the process which should be injected and DLL to inject.
@@ -61,6 +61,7 @@ This software is licensed under [Zero Clause BSD] license, terms of which are av
 
 ___
 
+[official forum thread]: https://cs.rin.ru/forum/viewtopic.php?f=10&t=112021
 [Task Dialog]: https://docs.microsoft.com/en-us/windows/win32/controls/task-dialogs-overview#:~:text=A%20task%20dialog%20is%20a,features%20than%20a%20message%20box.
 [vcpkg]: https://github.com/Microsoft/vcpkg#quick-start-windows
 [spdlog]: https://github.com/gabime/spdlog
