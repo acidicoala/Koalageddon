@@ -57,13 +57,6 @@
 		}
 	},
 	"ignore": [
-		// Do not inject our own injector
-		"Injector32.exe",
-		"Injector64.exe",
-		// System
-		"reg.exe",
-		"cmd.exe",
-		"regsvr32.exe",
 		// Unreal Engine
 		"CrashReportClient.exe",
 		// Origin integration with other stores
