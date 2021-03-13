@@ -12,6 +12,35 @@ auto getEpicConfig()
 	return config->platforms["Epic Games"];
 }
 
+struct CallbackContainer
+{
+	void* clientData;
+	EOS_Ecom_OnQueryOwnershipCallback originalCallback;
+};
+
+EOS_CALL void QueryOwnershipCallback(const EOS_Ecom_QueryOwnershipCallbackInfo* Data)
+{
+	auto data = const_cast<EOS_Ecom_QueryOwnershipCallbackInfo*>(Data);
+
+	logger->info("Responding with {} items", data->ItemOwnershipCount);
+
+	for(unsigned i = 0; i < data->ItemOwnershipCount; i++)
+	{
+		auto isBlacklisted = vectorContains(getEpicConfig().blacklist, string(data->ItemOwnership[i].Id));
+
+		auto ownership = data->ItemOwnership[i];
+		ownership.OwnershipStatus = isBlacklisted ? EOS_EOwnershipStatus::EOS_OS_NotOwned : EOS_EOwnershipStatus::EOS_OS_Owned;
+		logger->info("\t{} [{}]", ownership.Id, ownership.OwnershipStatus == EOS_EOwnershipStatus::EOS_OS_Owned ? "Owned" : "Not Owned");
+	}
+
+	auto container = (CallbackContainer*) Data->ClientData;
+	data->ClientData = container->clientData;
+	container->originalCallback(Data);
+	logger->debug("Original QueryOwnership callback called");
+
+	delete container;
+}
+
 void EOS_CALL EOS_Ecom_QueryOwnership(
 	EOS_HEcom Handle,
 	const EOS_Ecom_QueryOwnershipOptions* Options,
@@ -19,33 +48,12 @@ void EOS_CALL EOS_Ecom_QueryOwnership(
 	const EOS_Ecom_OnQueryOwnershipCallback CompletionDelegate
 )
 {
-	auto itemCount = Options->CatalogItemIdCount;
-	auto ownerships = new EOS_Ecom_ItemOwnership[itemCount];
+	logger->info("Game requested ownership of {} items", Options->CatalogItemIdCount);
 
-	logger->info("Game requested ownership of {} items", itemCount);
-	for(uint32_t i = 0; i < itemCount; i++)
-	{
-		// Epic magic happens here
-		ownerships[i].ApiVersion = EOS_ECOM_ITEMOWNERSHIP_API_LATEST;
-		ownerships[i].Id = Options->CatalogItemIds[i];
-		auto isBlacklisted = vectorContains(getEpicConfig().blacklist, string(ownerships[i].Id));
-		ownerships[i].OwnershipStatus = isBlacklisted ? EOS_EOwnershipStatus::EOS_OS_NotOwned : EOS_EOwnershipStatus::EOS_OS_Owned;
+	auto container = new CallbackContainer{ ClientData, CompletionDelegate };
 
-		logger->info("\t{} [{}]", ownerships[i].Id, (bool) ownerships[i].OwnershipStatus ? "Owned" : "NotOwned");
-	}
-
-	EOS_Ecom_QueryOwnershipCallbackInfo callbackInfo =
-	{
-		EOS_EResult::EOS_Success,
-		ClientData,
-		Options->LocalUserId,
-		ownerships,
-		Options->CatalogItemIdCount
-	};
-
-	CompletionDelegate(&callbackInfo);
-
-	delete[] ownerships;
+	GET_PROXY_FUNC(EOS_Ecom_QueryOwnership);
+	proxyFunc(Handle, Options, container, QueryOwnershipCallback);
 }
 
 void EOS_CALL EOS_Ecom_QueryEntitlements(
