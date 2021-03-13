@@ -18,7 +18,7 @@ struct CallbackContainer
 	EOS_Ecom_OnQueryOwnershipCallback originalCallback;
 };
 
-EOS_CALL void QueryOwnershipCallback(const EOS_Ecom_QueryOwnershipCallbackInfo* Data)
+void EOS_CALL QueryOwnershipCallback(const EOS_Ecom_QueryOwnershipCallbackInfo* Data)
 {
 	auto data = const_cast<EOS_Ecom_QueryOwnershipCallbackInfo*>(Data);
 
