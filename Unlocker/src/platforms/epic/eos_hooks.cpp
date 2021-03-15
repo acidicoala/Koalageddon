@@ -22,20 +22,23 @@ void EOS_CALL QueryOwnershipCallback(const EOS_Ecom_QueryOwnershipCallbackInfo* 
 {
 	auto data = const_cast<EOS_Ecom_QueryOwnershipCallbackInfo*>(Data);
 
+	logger->debug("QueryOwnershipCallback -> ResultCode: {}", Data->ResultCode);
 	logger->info("Responding with {} items", data->ItemOwnershipCount);
 
 	for(unsigned i = 0; i < data->ItemOwnershipCount; i++)
 	{
 		auto isBlacklisted = vectorContains(getEpicConfig().blacklist, string(data->ItemOwnership[i].Id));
 
-		auto ownership = data->ItemOwnership[i];
-		ownership.OwnershipStatus = isBlacklisted ? EOS_EOwnershipStatus::EOS_OS_NotOwned : EOS_EOwnershipStatus::EOS_OS_Owned;
-		logger->info("\t{} [{}]", ownership.Id, ownership.OwnershipStatus == EOS_EOwnershipStatus::EOS_OS_Owned ? "Owned" : "Not Owned");
+		auto item = const_cast <EOS_Ecom_ItemOwnership*>(data->ItemOwnership + i);
+		item->OwnershipStatus = isBlacklisted ? EOS_EOwnershipStatus::EOS_OS_NotOwned : EOS_EOwnershipStatus::EOS_OS_Owned;
+		logger->info("\t{} [{}]", item->Id, item->OwnershipStatus == EOS_EOwnershipStatus::EOS_OS_Owned ? "Owned" : "Not Owned");
 	}
 
-	auto container = (CallbackContainer*) Data->ClientData;
+	auto container = (CallbackContainer*) data->ClientData;
 	data->ClientData = container->clientData;
-	container->originalCallback(Data);
+	logger->debug("QueryOwnershipCallback -> ClientData: {}, CompletionDelegate: {}", data->ClientData, (void*) container->originalCallback);
+
+	container->originalCallback(data);
 	logger->debug("Original QueryOwnership callback called");
 
 	delete container;
@@ -49,8 +52,14 @@ void EOS_CALL EOS_Ecom_QueryOwnership(
 )
 {
 	logger->info("Game requested ownership of {} items", Options->CatalogItemIdCount);
+	if(Options->CatalogNamespace != NULL)
+		logger->debug("Catalog namespace: {}", Options->CatalogNamespace);
 
-	auto container = new CallbackContainer{ ClientData, CompletionDelegate };
+	logger->debug("EOS_Ecom_QueryOwnership -> ClientData: {}, CompletionDelegate: {}", ClientData, (void*) CompletionDelegate);
+
+	auto container = new CallbackContainer{ NULL };
+	container->clientData = ClientData;
+	container->originalCallback = CompletionDelegate;
 
 	GET_PROXY_FUNC(EOS_Ecom_QueryOwnership);
 	proxyFunc(Handle, Options, container, QueryOwnershipCallback);
