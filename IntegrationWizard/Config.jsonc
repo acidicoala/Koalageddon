@@ -53,7 +53,9 @@
 				"UplayService.exe",
 				"UplayWebCore.exe"
 			],
-			"blacklist": []
+			"blacklist": [ // Use aUplayId from the generated log file
+
+			]
 		}
 	},
 	"ignore": [

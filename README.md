@@ -1,5 +1,5 @@
 ﻿# 🐨 Koalageddon 💥
-#### Legit DLC Unlocker for Steam, Epic & Origin
+#### Legit DLC Unlocker for Steam, Epic, Origin & Uplay (R1)
 Welcome to the DreamAPI repository.
 For user-friendly introduction or support, please check out the [official forum thread]. This document is meant for software developers.
 
