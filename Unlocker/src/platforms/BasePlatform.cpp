@@ -1,19 +1,33 @@
 #include "pch.h"
 #include "BasePlatform.h"
 
+// TODO: Make constructor?
+void BasePlatform::init()
+{
+	if(initialized || handle == NULL)
+		return;
+
+	logger->debug("Initializing {} platform", getPlatformName());
+
+	platformInit();
+
+	logger->info("{} platform was initialized", getPlatformName());
+	initialized = true;
+}
+
 BasePlatform::BasePlatform(const HMODULE handle)
 {
 	this->handle = handle;
 
 	auto buffer = new WCHAR[MAX_PATH];
 	GetModuleBaseName(GetCurrentProcess(), handle, buffer, MAX_PATH);
-	this->moduleName = wtos(wstring(buffer));
+	this->moduleName = wtos(buffer);
 	delete[] buffer;
 }
 
 BasePlatform::BasePlatform(const wstring& fullDllName)
 {
-	moduleName = wtos(fullDllName);
+	this->moduleName = wtos(fullDllName);
 
 	auto handle = GetModuleHandle(fullDllName.c_str());
 	if(handle == NULL)
@@ -25,10 +39,30 @@ BasePlatform::BasePlatform(const wstring& fullDllName)
 	this->handle = handle;
 }
 
-void BasePlatform::installDetourHook(Hooks& hooks, void* hookedFunc, const char* funcName)
+// Destructor
+void BasePlatform::shutdown()
 {
-	static std::mutex mutex;
-	const std::lock_guard lock(mutex);
+	if(!initialized)
+		return;
+
+	logger->debug("Shutting down {} platform", getPlatformName());
+	
+	auto& hooks = getPlatformHooks();
+
+	for(auto& hook : hooks)
+	{
+		hook->unHook();
+	}
+	hooks.clear();
+	
+	logger->debug("{} platform was shut down", getPlatformName());
+}
+
+
+void BasePlatform::installDetourHook(void* hookedFunc, const char* funcName)
+{
+	
+	auto& hooks = getPlatformHooks();
 
 	if(auto original_func_address = GetProcAddress(handle, funcName))
 	{
@@ -44,13 +78,15 @@ void BasePlatform::installDetourHook(Hooks& hooks, void* hookedFunc, const char*
 		{
 			hooks.pop_back();
 			logger->warn("Failed to hook \"{}\" via Detour. Trying with IAT.", funcName);
-			installIatHook(hooks, hookedFunc, funcName);
+			installIatHook(hookedFunc, funcName);
 		}
 	}
 }
 
-void BasePlatform::installIatHook(Hooks& hooks, void* hookedFunc, const char* funcName)
+void BasePlatform::installIatHook(void* hookedFunc, const char* funcName)
 {
+	auto& hooks = getPlatformHooks();
+
 	hooks.push_back(make_unique<PLH::IatHook>
 		(moduleName, funcName, (char*) hookedFunc, &trampolineMap[funcName], L"")
 	);
@@ -63,12 +99,14 @@ void BasePlatform::installIatHook(Hooks& hooks, void* hookedFunc, const char* fu
 	{
 		hooks.pop_back();
 		logger->warn("Failed to hook \"{}\" via IAT.  Trying with EAT.", funcName);
-		installEatHook(hooks, hookedFunc, funcName);
+		installEatHook(hookedFunc, funcName);
 	}
 }
 
-void BasePlatform::installEatHook(Hooks& hooks, void* hookedFunc, const char* funcName)
+void BasePlatform::installEatHook(void* hookedFunc, const char* funcName)
 {
+	auto& hooks = getPlatformHooks();
+
 	hooks.push_back(make_unique<PLH::EatHook>
 		(funcName, stow(moduleName), (char*) hookedFunc, &trampolineMap[funcName])
 	);

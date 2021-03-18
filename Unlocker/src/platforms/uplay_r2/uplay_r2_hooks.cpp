@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "ubisoft_hooks.h"
-#include "platforms/ubisoft/Ubisoft.h"
+#include "uplay_r2_hooks.h"
+#include "platforms/uplay_r2/UplayR2.h"
 
 #define GET_PROXY_FUNC(FUNC) \
 	static auto proxyFunc = PLH::FnCast(BasePlatform::trampolineMap[#FUNC], FUNC);
@@ -11,7 +11,6 @@ vector<Product> products;
 
 vector<unsigned int> dlcs;
 vector<unsigned int> items;
-
 
 string productTypeToString(ProductType type)
 {

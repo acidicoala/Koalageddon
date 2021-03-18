@@ -19,11 +19,12 @@ constexpr auto STR_EOS_Ecom_Entitlement_Release = "_EOS_Ecom_Entitlement_Release
 
 class Epic : public BasePlatform
 {
+protected:
+	void platformInit() override;
+	string& getPlatformName() override;
+	Hooks& getPlatformHooks() override;
 public:
 	using BasePlatform::BasePlatform;
 
 	inline static Hooks hooks;
-
-	void init() override;
-	void shutdown() override;
 };

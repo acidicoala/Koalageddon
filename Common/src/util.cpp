@@ -56,13 +56,13 @@ wstring getProcessName(DWORD pid)
 	return wstring(buffer);
 }
 
-wstring getCurrentModuleName()
+wstring getCurrentProcessName()
 {
 	wchar_t name[MAX_PATH];
 	auto result = GetModuleFileName(NULL, name, MAX_PATH);
 
 	if(result == NULL)
-		logger->error("Failed to get current module's file name. Error code: {}", GetLastError());
+		logger->error("Failed to get current process file name. Error code: {}", GetLastError());
 
 	return wstring(name);
 }

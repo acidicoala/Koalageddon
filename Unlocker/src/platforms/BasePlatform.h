@@ -6,6 +6,7 @@ typedef vector<unique_ptr<PLH::IHook>> Hooks;
 
 class BasePlatform
 {
+private:
 protected:
 	string moduleName;
 	HMODULE handle = NULL;
@@ -15,11 +16,17 @@ protected:
 	// author of the hooking library that is used by this projet: PolyHook 2.
 	// The article was written for the v1 of the library, but the principles are the same in v2.
 	// https://www.codeproject.com/articles/1100579/polyhook-the-cplusplus-x-x-hooking-library
-	void installDetourHook(Hooks& hooks, void* hookedFunc, const char* funcName);
-	void installIatHook(Hooks& hooks, void* hookedFunc, const char* funcName);
-	void installEatHook(Hooks& hooks, void* hookedFunc, const char* funcName);
+	void installDetourHook(void* hookedFunc, const char* funcName);
+	void installIatHook(void* hookedFunc, const char* funcName);
+	void installEatHook(void* hookedFunc, const char* funcName);
 
+	virtual void platformInit() = 0;
+	virtual string& getPlatformName() = 0;
+	virtual Hooks& getPlatformHooks() = 0;
 public:
+	void init();
+	void shutdown();
+
 	// we can safely store original functions from all platforms
 	// in the corresponding single static container.
 	inline static map<string, uint64_t> trampolineMap;
@@ -28,7 +35,4 @@ public:
 	BasePlatform() = delete;
 	BasePlatform(const HMODULE handle);
 	BasePlatform(const wstring& fullDllName);
-
-	virtual void init() = 0;
-	virtual void shutdown() = 0;
 };

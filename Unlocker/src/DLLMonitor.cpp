@@ -5,7 +5,8 @@
 #include "platforms/epic/Epic.h"
 #include "platforms/steam/Steam.h"
 #include <platforms/origin/Origin.h>
-#include <platforms/ubisoft/Ubisoft.h>
+#include <platforms/uplay_r1/UplayR1.h>
+#include <platforms/uplay_r2/UplayR2.h>
 
 
 _LdrRegisterDllNotification LdrRegisterDllNotification = NULL;
@@ -48,6 +49,7 @@ void CALLBACK dllCallback(ULONG NotificationReason, PLDR_DLL_NOTIFICATION_DATA N
 			logger->info(L"Epic Games DLL has been detected");
 			platforms.push_back(make_unique<Epic>(NotificationData->Loaded.FullDllName->Buffer));
 			platforms.back()->init();
+
 		}
 		else if(dllName == STEAMAPI)
 		{
@@ -61,12 +63,18 @@ void CALLBACK dllCallback(ULONG NotificationReason, PLDR_DLL_NOTIFICATION_DATA N
 			platforms.push_back(make_unique<Origin>(NotificationData->Loaded.FullDllName->Buffer));
 			platforms.back()->init();
 		}
-		else if(dllName == UPLAY_R2)
+		else if(dllName == UPLAY_R1)
 		{
-			logger->info(L"Ubisoft DLL has been detected");
-			platforms.push_back(make_unique<Ubisoft>(NotificationData->Loaded.FullDllName->Buffer));
+			logger->info(L"UplayR1 DLL has been detected");
+			platforms.push_back(make_unique<UplayR1>(NotificationData->Loaded.FullDllName->Buffer));
 			platforms.back()->init();
 		}
+		/*else if(dllName == UPLAY_R2)
+		{
+			logger->info(L"UplayR2 DLL has been detected");
+			platforms.push_back(make_unique<UplayR2>(NotificationData->Loaded.FullDllName->Buffer));
+			platforms.back()->init();
+		}*/
 	}
 }
 
@@ -95,12 +103,18 @@ void checkLoadedDlls()
 		platforms.push_back(make_unique<Origin>(handle));
 		platforms.back()->init();
 	}
-	else if(handle = GetModuleHandle(UPLAY_R2))
+	else if(handle = GetModuleHandle(UPLAY_R1))
 	{
-		logger->info(L"Ubisoft DLL is already loaded");
-		platforms.push_back(make_unique<Ubisoft>(handle));
+		logger->info(L"UplayR1 DLL is already loaded");
+		platforms.push_back(make_unique<UplayR1>(handle));
 		platforms.back()->init();
 	}
+	/*else if(handle = GetModuleHandle(UPLAY_R2))
+	{
+		logger->info(L"UplayR2 DLL is already loaded");
+		platforms.push_back(make_unique<UplayR2>(handle));
+		platforms.back()->init();
+	}*/
 	else
 	{
 		return;
@@ -139,11 +153,13 @@ void DLLMonitor::shutdown()
 {
 	logger->debug("Shutting down DLL monitor");
 
+
 	for(auto& platform : platforms)
 	{
 		platform->shutdown();
 	}
 
+	// Deconstructor of each platform will do the unhooking
 	platforms.clear();
 
 	LdrUnregisterDllNotification(cookie);

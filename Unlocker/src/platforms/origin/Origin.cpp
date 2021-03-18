@@ -135,13 +135,8 @@ void readEntitlementsFromFile()
 	logger->info("Origin entitlements were successfully read from file");
 }
 
-void Origin::init()
+void Origin::platformInit()
 {
-	if(initialized || handle == NULL)
-		return;
-
-	logger->debug("Initializing Origin platform");
-
 	// Execute blocking operations in a new thread
 	std::thread fetchingThread([]{
 		logger->debug("Entitlement fetching thread started");
@@ -151,24 +146,18 @@ void Origin::init()
 	});
 	fetchingThread.detach();
 
-	installDetourHook(hooks, encrypt, mangled_encrypt);
-
-	logger->info("Origin platform was initialized");
-	initialized = true;
+	installDetourHook(encrypt, mangled_encrypt);
 }
 
-void Origin::shutdown()
+string& Origin::getPlatformName()
 {
-	if(!initialized)
-		return;
-
-	logger->debug("Shutting down Origin platform");
-
-	for(auto& hook : hooks)
-	{
-		hook->unHook();
-	}
-	hooks.clear();
-
-	logger->debug("Origin platform was shut down");
+	static string name = "Origin";
+	return name;
 }
+
+
+Hooks& Origin::getPlatformHooks()
+{
+	return hooks;
+}
+

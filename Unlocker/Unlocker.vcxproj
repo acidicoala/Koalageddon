@@ -219,13 +219,15 @@
     <ClInclude Include="src\platforms\steam\steamtypes.h" />
     <ClInclude Include="src\platforms\steam\steam_hooks.h" />
     <ClInclude Include="src\platforms\steam\steam_ordinals.h" />
-    <ClInclude Include="src\platforms\ubisoft\ubisoft_hooks.h" />
+    <ClInclude Include="src\platforms\uplay_r1\UplayR1.h" />
+    <ClInclude Include="src\platforms\uplay_r1\uplay_r1_hooks.h" />
+    <ClInclude Include="src\platforms\uplay_r2\uplay_r2_hooks.h" />
     <ClInclude Include="src\Unlocker.h" />
     <ClInclude Include="src\ntapi.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\ProcessHooker.h" />
     <ClInclude Include="src\platforms\steam\Steam.h" />
-    <ClInclude Include="src\platforms\ubisoft\Ubisoft.h" />
+    <ClInclude Include="src\platforms\uplay_r2\UplayR2.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\platforms\origin\Origin.cpp" />
@@ -237,7 +239,9 @@
     <ClCompile Include="src\platforms\epic\Epic.cpp" />
     <ClCompile Include="src\platforms\origin\origin_hooks.cpp" />
     <ClCompile Include="src\platforms\steam\steam_hooks.cpp" />
-    <ClCompile Include="src\platforms\ubisoft\ubisoft_hooks.cpp" />
+    <ClCompile Include="src\platforms\uplay_r1\UplayR1.cpp" />
+    <ClCompile Include="src\platforms\uplay_r1\uplay_r1_hooks.cpp" />
+    <ClCompile Include="src\platforms\uplay_r2\uplay_r2_hooks.cpp" />
     <ClCompile Include="src\Unlocker.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -247,7 +251,7 @@
     </ClCompile>
     <ClCompile Include="src\ProcessHooker.cpp" />
     <ClCompile Include="src\platforms\steam\Steam.cpp" />
-    <ClCompile Include="src\platforms\ubisoft\Ubisoft.cpp" />
+    <ClCompile Include="src\platforms\uplay_r2\UplayR2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">

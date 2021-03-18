@@ -1,5 +1,5 @@
 {
-	"config_version": 1, // DO NOT EDIT THIS VALUE
+	"config_version": 2, // DO NOT EDIT THIS VALUE
 	"log_level": "debug",
 	"platforms": {
 		"Steam": {
@@ -45,8 +45,8 @@
 				// "SIMS4.OFF.SOLP.0x0000000000030553" // Sims 4: Get Famous [Better stay anonymous]
 			]
 		},
-		"Ubisoft Connect": {
-			"enabled": false, // Ubisoft games unload the Unlocker DLL :(
+		"Uplay R1": {
+			"enabled": true,
 			"process": "upc.exe",
 			"replicate": true,
 			"ignore": [
@@ -60,10 +60,7 @@
 		// Unreal Engine
 		"CrashReportClient.exe",
 		// Origin integration with other stores
-		"EALink.exe",
-		// Ubisoft integration with other stores
-		"UbisoftGameLauncher.exe",
-		"UbisoftGameLauncher64.exe"
+		"EALink.exe"
 	],
 	"terminate": [
 		// Steam

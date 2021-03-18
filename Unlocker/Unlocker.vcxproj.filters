@@ -30,14 +30,20 @@
     <Filter Include="Header Files\platforms\origin">
       <UniqueIdentifier>{a09035ba-a888-4765-86c3-5d1df17bdf5a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\platforms\ubisoft">
-      <UniqueIdentifier>{3fa38e81-3df5-4991-ab87-30a327edacfe}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\platforms\origin">
       <UniqueIdentifier>{e6dd8cef-5536-4417-88af-da4931ab890d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\platforms\ubisoft">
+    <Filter Include="Source Files\platforms\uplay_r2">
       <UniqueIdentifier>{dead7396-6b35-46bc-9107-d06731daa0cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\platforms\uplay_r2">
+      <UniqueIdentifier>{3fa38e81-3df5-4991-ab87-30a327edacfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\platforms\uplay_r1">
+      <UniqueIdentifier>{5fe452a7-3c29-4ce1-a4b2-1bf90c6b15ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\platforms\uplay_r1">
+      <UniqueIdentifier>{e1f0bb2b-4cf4-4a3b-8c4c-d5e216cd5eba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -101,11 +107,17 @@
     <ClInclude Include="src\platforms\origin\Origin.h">
       <Filter>Header Files\platforms\origin</Filter>
     </ClInclude>
-    <ClInclude Include="src\platforms\ubisoft\Ubisoft.h">
-      <Filter>Header Files\platforms\ubisoft</Filter>
+    <ClInclude Include="src\platforms\uplay_r2\UplayR2.h">
+      <Filter>Header Files\platforms\uplay_r2</Filter>
     </ClInclude>
-    <ClInclude Include="src\platforms\ubisoft\ubisoft_hooks.h">
-      <Filter>Header Files\platforms\ubisoft</Filter>
+    <ClInclude Include="src\platforms\uplay_r2\uplay_r2_hooks.h">
+      <Filter>Header Files\platforms\uplay_r2</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platforms\uplay_r1\UplayR1.h">
+      <Filter>Header Files\platforms\uplay_r1</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platforms\uplay_r1\uplay_r1_hooks.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -148,11 +160,17 @@
     <ClCompile Include="src\platforms\origin\origin_hooks.cpp">
       <Filter>Source Files\platforms\origin</Filter>
     </ClCompile>
-    <ClCompile Include="src\platforms\ubisoft\ubisoft_hooks.cpp">
-      <Filter>Source Files\platforms\ubisoft</Filter>
+    <ClCompile Include="src\platforms\uplay_r2\uplay_r2_hooks.cpp">
+      <Filter>Source Files\platforms\uplay_r2</Filter>
     </ClCompile>
-    <ClCompile Include="src\platforms\ubisoft\Ubisoft.cpp">
-      <Filter>Source Files\platforms\ubisoft</Filter>
+    <ClCompile Include="src\platforms\uplay_r2\UplayR2.cpp">
+      <Filter>Source Files\platforms\uplay_r2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platforms\uplay_r1\UplayR1.cpp">
+      <Filter>Source Files\platforms\uplay_r1</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platforms\uplay_r1\uplay_r1_hooks.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

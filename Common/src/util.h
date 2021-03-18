@@ -28,7 +28,7 @@ constexpr auto UNLOCKER_NAME = "Unlocker32";
 
 // Process info
 wstring getProcessName(DWORD pid);
-wstring getCurrentModuleName();
+wstring getCurrentProcessName();
 path getProcessPath(HANDLE handle = NULL);
 bool is32bit(DWORD PID);
 bool is32bit(HANDLE hProcess);

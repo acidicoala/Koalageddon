@@ -1,8 +1,7 @@
 #pragma once
-#include "../BasePlatform.h"
-#include "steamtypes.h"
+#include "platforms/BasePlatform.h"
 
-class Steam : public BasePlatform
+class UplayR2 : public BasePlatform
 {
 protected:
 	void platformInit() override;
