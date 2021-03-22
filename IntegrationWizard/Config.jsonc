@@ -1,11 +1,12 @@
 {
-	"config_version": 2, // DO NOT EDIT THIS VALUE
+	"config_version": 3, // DO NOT EDIT THIS VALUE
 	"log_level": "debug",
 	"platforms": {
 		"Steam": {
 			"enabled": true,
 			"process": "steam.exe",
-			"replicate": true,
+			"replicate": false,
+			"unlock_shared_library": true,
 			"ignore": [
 				"x86launcher.exe",
 				"x64launcher.exe",
@@ -60,6 +61,7 @@
 	},
 	"ignore": [
 		// Unreal Engine
+		"UnrealCEFSubProcess.exe",
 		"CrashReportClient.exe",
 		// Origin integration with other stores
 		"EALink.exe"

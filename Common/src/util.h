@@ -21,15 +21,16 @@ constexpr auto UNLOCKER_64 = L"Unlocker64.dll";
 constexpr auto UNLOCKER_32 = L"Unlocker32.dll";
 
 #ifdef _WIN64
-constexpr auto UNLOCKER_NAME = "Unlocker64";
+constexpr auto UNLOCKER_DLL = "Unlocker64.dll";
 #else
-constexpr auto UNLOCKER_NAME = "Unlocker32";
+constexpr auto UNLOCKER_DLL = "Unlocker32.dll";
 #endif
 
 // Process info
 wstring getProcessName(DWORD pid);
-wstring getCurrentProcessName();
-path getProcessPath(HANDLE handle = NULL);
+path getCurrentProcessPath();
+string getCurrentProcessName();
+path getProcessPath(HANDLE handle);
 bool is32bit(DWORD PID);
 bool is32bit(HANDLE hProcess);
 void killProcess(HANDLE hProcess, DWORD sleepMS = 0);

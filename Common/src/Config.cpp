@@ -16,15 +16,29 @@ void from_json(const json& j, Platform& p)
 	j["blacklist"].get_to(p.blacklist);
 }
 
+void from_json(const json& j, SteamPlatform& p)
+{
+	from_json(j, (Platform&) p);
+	j["unlock_shared_library"].get_to(p.unlock_shared_library);
+}
+
+void from_json(const json& j, Platforms& p)
+{
+	j["Steam"].get_to(p.Steam);
+	j["Epic Games"].get_to(p.EpicGames);
+	j["Origin"].get_to(p.Origin);
+	j["Uplay R1"].get_to(p.UplayR1);
+}
+
 Config::Config()
 {
-	auto fullPath = getWorkingDirPath() / L"Config.jsonc";
+	auto fullPath = getWorkingDirPath() / CONFIG_NAME;
 
 	std::ifstream ifs(fullPath, std::ios::in);
 
 	if(!ifs.good())
 	{
-		MessageBox(NULL, fullPath.c_str(), L"Config not found at: ", MB_ICONERROR | MB_ICONERROR);
+		MessageBox(NULL, fullPath.c_str(), L"Config not found at: ", MB_ICONERROR);
 		exit(1);
 	}
 
@@ -34,11 +48,12 @@ Config::Config()
 
 		GET(j, log_level);
 		GET(j, platforms);
+		GET(j, platformRefs);
 		GET(j, ignore);
 		GET(j, terminate);
 	} catch(json::exception e)
 	{
-		MessageBoxA(NULL, e.what(), "Error parsing config file", MB_ICONERROR | MB_ICONERROR);
+		MessageBoxA(NULL, e.what(), "Error parsing config file", MB_ICONERROR);
 		exit(1);
 	}
 }

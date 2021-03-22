@@ -16,16 +16,23 @@ void init(HMODULE hModule)
 
 	DisableThreadLibraryCalls(hModule);
 
-	auto currentProcess = getProcessPath();
-	logger->debug("Current process: {}", currentProcess.string());
+	auto currentProcess = getCurrentProcessName();
+	logger->debug("Current process: {}", currentProcess);
 
 	for(const auto& [key, platform] : config->platforms)
 	{
-		if(stringsAreEqual(currentProcess.filename().string(), platform.process))
+		if(stringsAreEqual(currentProcess, platform.process))
 		{
 			logger->info("Target platform detected: {}", platform.process);
-			auto unlockerPath = absolute(getReg(WORKING_DIR)) / (UNLOCKER_NAME + string(".dll"));
+
+			if(!platform.enabled)
+			{
+				logger->info("Skipping injection for {} platform since it is disabled: {}", platform.process);
+			}
+
+			auto unlockerPath = getWorkingDirPath() / UNLOCKER_DLL;
 			logger->debug("Unlocker path: {}", unlockerPath.string());
+
 			hUnlocker = LoadLibrary(unlockerPath.wstring().c_str());
 			if(hUnlocker == NULL)
 			{

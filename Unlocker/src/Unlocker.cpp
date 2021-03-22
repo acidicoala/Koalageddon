@@ -21,10 +21,10 @@ void Unlocker::init(HMODULE hModule)
 
 	Config::init();
 
-	Logger::init(UNLOCKER_NAME, true);
+	Logger::init(UNLOCKER_DLL, true);
 
 	logger->info("Unlocker v{}", VERSION);
-	logger->info(L"Hooking into \"{}\"", getCurrentProcessName());
+	logger->info("Hooking into '{}'", getCurrentProcessName());
 
 	DLLMonitor::init();
 	ProcessHooker::init();

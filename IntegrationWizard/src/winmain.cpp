@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Logger.h"
+#include "Config.h"
 #include "constants.h"
 #include "IntegrationWizard.h"
 #include "../resource.h"
@@ -56,26 +57,35 @@ void fatalError(string message)
 
 void firstSetup()
 {
-	setReg(WORKING_DIR, getProcessPath().parent_path().c_str());
+	setReg(WORKING_DIR, getCurrentProcessPath().parent_path().c_str());
 
-	auto configPath = getWorkingDirPath() / L"Config.jsonc";
+	auto configPath = getWorkingDirPath() / CONFIG_NAME;
 	
 	if(!std::filesystem::exists(configPath))
 	{ // Copy the default config is none was found
 		HRSRC hResource = FindResource(nullptr, MAKEINTRESOURCE(IDR_DEFAULT_CONFIG), L"CONFIG");
 		if(hResource == NULL)
+		{
 			fatalError("Failed to find config resource");
+			return;
+		}
 
 		HGLOBAL hMemory = LoadResource(nullptr, hResource);
 		if(hMemory == NULL)
+		{
 			fatalError("Failed to load config resource");
+			return;
+		}
 
 		auto size = SizeofResource(nullptr, hResource);
 		auto dataPtr = LockResource(hMemory);
 
 		std::ofstream configFile(configPath, std::ios::out | std::ios::binary);
 		if(!configFile.good())
+		{
 			fatalError("Failed to open output file stream");
+			return;
+		}
 
 		configFile.write((char*) dataPtr, size);
 		configFile.close();
@@ -105,11 +115,9 @@ int APIENTRY wWinMain(
 	{
 		case Action::UNEXPECTED_ERROR:
 			logger->error("Unexpected action result. Error code: 0x{:X}", GetLastError());
-			exit(1);
 			break;
 		case Action::NO_ACTION:
 			logger->info("No action was taken. Terminating.");
-			exit(0);
 			break;
 		case Action::INSTALL_INTEGRATIONS:
 			IntegrationWizard::install();
@@ -119,7 +127,6 @@ int APIENTRY wWinMain(
 			break;
 		default:
 			logger->error("Unexpected action result");
-			exit(1);
 	}
 
 	Wow64RevertWow64FsRedirection(oldVal);

@@ -136,7 +136,7 @@ void injectIfNecessary(wstring cmdLine, LPPROCESS_INFORMATION lpProcessInformati
 	// Iterate over platforms
 	for(const auto& [key, platform] : config->platforms)
 	{
-		if(stringsAreEqual(getProcessPath().filename().string(), platform.process))
+		if(stringsAreEqual(getCurrentProcessName(), platform.process))
 		{
 			// This is a platform process
 			if(!platform.replicate)

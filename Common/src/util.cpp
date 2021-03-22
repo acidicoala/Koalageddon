@@ -56,15 +56,19 @@ wstring getProcessName(DWORD pid)
 	return wstring(buffer);
 }
 
-wstring getCurrentProcessName()
+path getCurrentProcessPath()
 {
-	wchar_t name[MAX_PATH];
-	auto result = GetModuleFileName(NULL, name, MAX_PATH);
+	TCHAR buffer[MAX_PATH];
 
-	if(result == NULL)
+	if(GetModuleFileName(NULL, buffer, MAX_PATH) == NULL)
 		logger->error("Failed to get current process file name. Error code: {}", GetLastError());
 
-	return wstring(name);
+	return absolute(buffer);
+}
+
+string getCurrentProcessName()
+{
+	return getCurrentProcessPath().filename().string();
 }
 
 /**
@@ -75,13 +79,8 @@ process path is returned.
 path getProcessPath(HANDLE handle)
 {
 	TCHAR buffer[MAX_PATH];
-	DWORD result = 0;
-	if(handle == NULL)
-		result = GetModuleFileName(NULL, buffer, MAX_PATH);
-	else
-		result = GetModuleFileNameEx(handle, NULL, buffer, MAX_PATH);
 
-	if(result == NULL)
+	if(GetModuleFileNameEx(handle, NULL, buffer, MAX_PATH) == NULL)
 	{
 		auto message = fmt::format("Failed to obtain process path. Error code: 0x{:X}", GetLastError());
 		throw std::exception(message.c_str());
