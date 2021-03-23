@@ -2,8 +2,6 @@
 #include "Config.h"
 #include "util.h"
 
-using nlohmann::json;
-
 // Source: https://stackoverflow.com/a/54394658/3805929
 #define GET(j, key) this->key = j[#key].get<decltype(key)>()
 
@@ -48,9 +46,10 @@ Config::Config()
 
 		GET(j, log_level);
 		GET(j, platforms);
-		GET(j, platformRefs);
 		GET(j, ignore);
 		GET(j, terminate);
+
+		platformRefs = j["platforms"].get<Platforms>();
 	} catch(json::exception e)
 	{
 		MessageBoxA(NULL, e.what(), "Error parsing config file", MB_ICONERROR);

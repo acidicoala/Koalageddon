@@ -4,6 +4,7 @@
 #include "constants.h"
 #include "platforms/epic/Epic.h"
 #include "platforms/steam/Steam.h"
+#include <platforms/steam_client/SteamClient.h>
 #include <platforms/origin/Origin.h>
 #include <platforms/uplay_r1/UplayR1.h>
 #include <platforms/uplay_r2/UplayR2.h>
@@ -34,7 +35,6 @@ bool getNtFunctions()
 	return true;
 }
 
-
 void CALLBACK dllCallback(ULONG NotificationReason, PLDR_DLL_NOTIFICATION_DATA NotificationData, PVOID Context)
 {
 	if(NotificationReason == LDR_DLL_NOTIFICATION_REASON_LOADED)
@@ -55,6 +55,12 @@ void CALLBACK dllCallback(ULONG NotificationReason, PLDR_DLL_NOTIFICATION_DATA N
 		{
 			logger->info(L"Steam DLL has been detected");
 			platforms.push_back(make_unique<Steam>(NotificationData->Loaded.FullDllName->Buffer));
+			platforms.back()->init();
+		}
+		else if(dllName == STEAM_CLIENT)
+		{
+			logger->info(L"SteamClient DLL has been detected");
+			platforms.push_back(make_unique<SteamClient>(NotificationData->Loaded.FullDllName->Buffer));
 			platforms.back()->init();
 		}
 		else if(dllName == ORIGINCLIENT)
@@ -95,6 +101,12 @@ void checkLoadedDlls()
 	{
 		logger->info("Steam DLL is already loaded");
 		platforms.push_back(make_unique<Steam>(handle));
+		platforms.back()->init();
+	}
+	else if(handle = GetModuleHandle(STEAM_CLIENT))
+	{
+		logger->info("SteamClient DLL is already loaded");
+		platforms.push_back(make_unique<SteamClient>(handle));
 		platforms.back()->init();
 	}
 	else if(handle = GetModuleHandle(ORIGINCLIENT))

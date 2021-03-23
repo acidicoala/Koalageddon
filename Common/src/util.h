@@ -13,6 +13,7 @@ using std::make_unique;
 using std::filesystem::absolute;
 using std::filesystem::path;
 using std::filesystem::copy_options;
+using nlohmann::json;
 
 constexpr auto INJECTOR_64 = L"Injector64.exe";
 constexpr auto INJECTOR_32 = L"Injector32.exe";
@@ -20,11 +21,15 @@ constexpr auto INJECTOR_32 = L"Injector32.exe";
 constexpr auto UNLOCKER_64 = L"Unlocker64.dll";
 constexpr auto UNLOCKER_32 = L"Unlocker32.dll";
 
+
 #ifdef _WIN64
+constexpr auto UNLOCKER_NAME = "Unlocker64";
 constexpr auto UNLOCKER_DLL = "Unlocker64.dll";
 #else
+constexpr auto UNLOCKER_NAME = "Unlocker32";
 constexpr auto UNLOCKER_DLL = "Unlocker32.dll";
 #endif
+
 
 // Process info
 wstring getProcessName(DWORD pid);
@@ -34,6 +39,7 @@ path getProcessPath(HANDLE handle);
 bool is32bit(DWORD PID);
 bool is32bit(HANDLE hProcess);
 void killProcess(HANDLE hProcess, DWORD sleepMS = 0);
+string getModuleVersion(string filename);
 
 // String utils
 string wtos(const wstring& wstr);
@@ -43,12 +49,13 @@ bool contains(wstring haystack, wstring needle);
 bool startsWith(string word, string prefix);
 bool endsWith(string word, string postfix);
 string toLower(string str);
-bool stringsAreEqual(string one, string two);
+bool stringsAreEqual(string one, string two, bool insensitive = false);
 
 // Registry
 wstring getReg(LPCWSTR key);
 void setReg(LPCWSTR key, LPCWSTR val);
 path getWorkingDirPath();
+path getCacheDirPath();
 
 // File access
 string readFileContents(string path);

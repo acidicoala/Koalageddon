@@ -118,7 +118,7 @@ void injectIfNecessary(wstring cmdLine, LPPROCESS_INFORMATION lpProcessInformati
 	std::wregex pattern(LR"(\w+\.exe)");
 
 	// Ignore system processes
-	std::wregex windowsPattern(LR"(^"[A-Za-z]:\\[Ww]indows\\.*\.exe)");
+	std::wregex windowsPattern(LR"(^"[A-Za-z]:\\[Ww][Ii][Nn][Dd][Oo][Ww][Ss]\\.*\.exe)");
 	if(regex_search(cmdLine.cbegin(), cmdLine.cend(), match, windowsPattern))
 	{
 		logger->debug("Skipping injection into a Windows process");

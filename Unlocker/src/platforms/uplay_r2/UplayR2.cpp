@@ -11,10 +11,9 @@ void UplayR2::platformInit()
 	HOOK(UPC_ProductListFree);
 }
 
-string& UplayR2::getPlatformName()
+string UplayR2::getPlatformName()
 {
-	static string name = "Uplay R2";
-	return name;
+	return "Uplay R2";
 }
 
 

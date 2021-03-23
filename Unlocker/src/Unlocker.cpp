@@ -21,13 +21,15 @@ void Unlocker::init(HMODULE hModule)
 
 	Config::init();
 
-	Logger::init(UNLOCKER_DLL, true);
+	Logger::init(UNLOCKER_NAME, true);
 
 	logger->info("Unlocker v{}", VERSION);
 	logger->info("Hooking into '{}'", getCurrentProcessName());
 
 	DLLMonitor::init();
 	ProcessHooker::init();
+
+	//if(getCurrentProcessName() == Steam)
 
 	initialized = true;
 	logger->debug("Unlocker initialization complete");

@@ -27,7 +27,8 @@ void init(HMODULE hModule)
 
 			if(!platform.enabled)
 			{
-				logger->info("Skipping injection for {} platform since it is disabled: {}", platform.process);
+				logger->info("Skipping injection for {} platform since it is disabled", platform.process);
+				return;
 			}
 
 			auto unlockerPath = getWorkingDirPath() / UNLOCKER_DLL;

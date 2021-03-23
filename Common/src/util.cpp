@@ -30,9 +30,12 @@ string toLower(string str)
 }
 
 /// Case-insensitive string comparison. Returns true if strings are equal.
-bool stringsAreEqual(string one, string two)
+bool stringsAreEqual(string one, string two, bool insensitive)
 {
-	return toLower(one) == toLower(two);
+	if(insensitive)
+		return _stricmp(one.c_str(), two.c_str());
+	else
+		return toLower(one) == toLower(two);
 }
 
 wstring getProcessName(DWORD pid)
@@ -92,6 +95,11 @@ path getProcessPath(HANDLE handle)
 path getWorkingDirPath()
 {
 	return absolute(getReg(WORKING_DIR));
+}
+
+path getCacheDirPath()
+{
+	return getWorkingDirPath() / "cache";
 }
 
 bool is32bit(DWORD PID)
@@ -222,5 +230,46 @@ void showInfo(string message, string title, bool shouldLog)
 		logger->info(message);
 
 	MessageBoxA(NULL, message.c_str(), title.c_str(), MB_ICONINFORMATION | MB_OK);
+}
+
+
+string getModuleVersion(string filename)
+{
+	auto lptstrFilename = stow(filename).c_str();
+
+	DWORD dwHandle;
+	DWORD dwLen = GetFileVersionInfoSize(lptstrFilename, &dwHandle);
+
+	LPBYTE lpBuffer = NULL;
+	UINT size = 0;
+	if(dwLen > 0)
+	{
+		BYTE* pbBuf = new BYTE[dwLen];
+		if(GetFileVersionInfo(lptstrFilename, dwHandle, dwLen, pbBuf))
+		{
+			if(VerQueryValue(pbBuf, L"\\", (LPVOID*) &lpBuffer, &size))
+			{
+				if(size)
+				{
+					VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*) lpBuffer;
+					if(verInfo->dwSignature == 0xfeef04bd)
+					{
+						auto version = fmt::format("{}.{}.{}.{}",
+							(verInfo->dwFileVersionMS >> 16) & 0xffff,
+							(verInfo->dwFileVersionMS >> 0) & 0xffff,
+							(verInfo->dwFileVersionLS >> 16) & 0xffff,
+							(verInfo->dwFileVersionLS >> 0) & 0xffff
+						);
+
+						return version;
+					}
+				}
+			}
+		}
+	}
+
+	logger->error("Failed to get file version size of: {}", filename);
+	return "0.0.0.0";
+
 }
 

@@ -55,7 +55,7 @@ void enumerateProcesses(function<void(HANDLE hProcess, path processPath, string 
 
 			for(const auto& [key, platform] : config->platforms)
 			{
-				if(stringsAreEqual(processName, platform.process) && platform.enabled)
+				if(stringsAreEqual(processName, platform.process))
 				{
 					logger->info("Target process detected: '{}'", processName);
 					callback(hProcess, processPath, processName);

@@ -12,10 +12,9 @@ void Steam::platformInit()
 	HOOK(SteamClient);
 }
 
-string& Steam::getPlatformName()
+string Steam::getPlatformName()
 {
-	static string name = "Steam";
-	return name;
+	return "Steam";
 }
 
 

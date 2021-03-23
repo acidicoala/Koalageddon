@@ -2,11 +2,11 @@
 #include "origin_hooks.h"
 #include "platforms/origin/Origin.h"
 
-XMLDocument entitlementsXML;
+XMLDocument entitlementsXML; // TODO: Move to Origin.h?
 
-auto getOriginConfig()
+auto& getOriginConfig()
 {
-	return config->platforms["Origin"];
+	return config->platformRefs.Origin;
 }
 
 bool isEntitlementBlacklisted(XMLElement* pEntitlement)

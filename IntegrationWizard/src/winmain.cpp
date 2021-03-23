@@ -50,7 +50,7 @@ Action askForAction(HINSTANCE hInstance)
 
 void fatalError(string message)
 {
-	message = fmt::format("{}. Error code: 0x{:X}", message, GetLastError());
+	message = fmt::format("{}. Error code: {}", message, (void*) GetLastError());
 	MessageBoxA(NULL, message.c_str(), "Fatal Error", MB_ICONERROR | MB_OK);
 	exit(1);
 }
@@ -60,36 +60,58 @@ void firstSetup()
 	setReg(WORKING_DIR, getCurrentProcessPath().parent_path().c_str());
 
 	auto configPath = getWorkingDirPath() / CONFIG_NAME;
-	
-	if(!std::filesystem::exists(configPath))
-	{ // Copy the default config is none was found
-		HRSRC hResource = FindResource(nullptr, MAKEINTRESOURCE(IDR_DEFAULT_CONFIG), L"CONFIG");
-		if(hResource == NULL)
-		{
-			fatalError("Failed to find config resource");
-			return;
-		}
 
-		HGLOBAL hMemory = LoadResource(nullptr, hResource);
-		if(hMemory == NULL)
-		{
-			fatalError("Failed to load config resource");
-			return;
-		}
-
-		auto size = SizeofResource(nullptr, hResource);
-		auto dataPtr = LockResource(hMemory);
-
-		std::ofstream configFile(configPath, std::ios::out | std::ios::binary);
-		if(!configFile.good())
-		{
-			fatalError("Failed to open output file stream");
-			return;
-		}
-
-		configFile.write((char*) dataPtr, size);
-		configFile.close();
+	// Load the default config into memory
+	HRSRC hResource = FindResource(nullptr, MAKEINTRESOURCE(IDR_DEFAULT_CONFIG), L"CONFIG");
+	if(hResource == NULL)
+	{
+		fatalError("Failed to find config resource");
+		return;
 	}
+
+	HGLOBAL hMemory = LoadResource(nullptr, hResource);
+	if(hMemory == NULL)
+	{
+		fatalError("Failed to load config resource");
+		return;
+	}
+
+	auto size = SizeofResource(nullptr, hResource);
+	auto dataPtr = LockResource(hMemory);
+
+	if(std::filesystem::exists(configPath))
+	{ // If config exists, check if it needs updating
+		auto ifs = std::ifstream(getWorkingDirPath() / CONFIG_NAME, std::ios::in);
+		if(!ifs.good())
+		{
+			fatalError("Failed to open input stream to read existing config file");
+			return;
+		}
+
+		auto configJson = nlohmann::json::parse(ifs, nullptr, true, true);
+		auto logLevel = configJson["config_version"].get<int>();
+
+		auto is = std::istringstream(string((char*) dataPtr));
+		auto defaultConfigJson = nlohmann::json::parse(is, nullptr, true, true);
+		auto defaultLogLevel = defaultConfigJson["config_version"].get<int>();
+
+		// Do not copy if the log versions are matching
+		if(logLevel == defaultLogLevel)
+			return;
+	}
+
+	// Copy the default config
+	std::ofstream configFile(configPath, std::ios::out | std::ios::binary);
+	if(!configFile.good())
+	{
+		fatalError("Failed to open output file stream when writing config file");
+		return;
+	}
+
+	configFile.write((char*) dataPtr, size);
+	configFile.close();
+
+
 }
 
 
@@ -101,6 +123,7 @@ int APIENTRY wWinMain(
 )
 {
 	firstSetup();
+	Config::init();
 	Logger::init("IntegrationWizard", true);
 	logger->info("Integration Wizard v{}", VERSION);
 

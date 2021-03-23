@@ -4,9 +4,9 @@
 #include "steam_ordinals.h"
 #include "platforms/steam/Steam.h"
 
-auto getSteamConfig()
+auto& getSteamConfig()
 {
-	return config->platforms["Steam"];
+	return config->platformRefs.Steam;
 }
 
 // forward declaration
@@ -55,10 +55,10 @@ bool __fastcall ISteamApps_BGetDLCDataByIndex(PARAMS(int iDLC, AppId_t* pAppID, 
 		ISteamApps_BGetDLCDataByIndex
 	)(ARGS(iDLC, pAppID, pbAvailable, pchName, cchNameBufferSize));
 
+	logger->info("\tDLC Data -> index: {}, App ID: {}, available: {}, name: {}", iDLC, *pAppID, *pbAvailable, pchName);
+
 	// Steam magic happens here (3)
 	*pbAvailable = !vectorContains(getSteamConfig().blacklist, std::to_string(*pAppID));
-
-	logger->info("\tDLC Data -> index: {}, App ID: {}, available: {}, name: {}", iDLC, *pAppID, *pbAvailable, pchName);
 
 	return result;
 }

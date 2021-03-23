@@ -40,3 +40,5 @@ extern PLH::CapstoneDisassembler disassembler;
 #define PARAMS(...) void* ECX, void* EDX, ##__VA_ARGS__
 #define ARGS(...) ECX, EDX, ##__VA_ARGS__
 #endif
+
+#define HOOK_SPEC(TYPE) NOINLINE TYPE __fastcall

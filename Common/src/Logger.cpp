@@ -13,7 +13,8 @@ void init(string loggerName, bool truncate)
 
 	try
 	{
-		auto fileName = fmt::format("{}.{}.log", loggerName, getCurrentProcessName());
+		auto processName = getCurrentProcessPath().stem().string();
+		auto fileName = fmt::format("{}.{}.log", loggerName, processName);
 		auto path = getWorkingDirPath() / "logs" / fileName;
 		logger = spdlog::basic_logger_mt(loggerName, path.u8string(), truncate);
 		logger->set_pattern("[%H:%M:%S.%e] [%l]\t%v");

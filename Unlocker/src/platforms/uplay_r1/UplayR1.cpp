@@ -10,10 +10,9 @@ void UplayR1::platformInit()
 	HOOK(UPLAY_USER_IsOwned);
 }
 
-string& UplayR1::getPlatformName()
+string UplayR1::getPlatformName()
 {
-	static string name = "Uplay R1";
-	return name;
+	return "Uplay R1";
 }
 
 

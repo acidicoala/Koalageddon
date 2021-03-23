@@ -114,7 +114,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_SILENCE_CXX17_C_HEADER_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -122,8 +122,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)Common\src;$(ProjectDir)src</AdditionalIncludeDirectories>
-      <BufferSecurityCheck>
-      </BufferSecurityCheck>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -138,7 +137,7 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_SILENCE_CXX17_C_HEADER_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -146,6 +145,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)Common\src;$(ProjectDir)src</AdditionalIncludeDirectories>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -160,7 +160,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;HOOKER_EXPORTS;_WINDOWS;_USRDLL;_SILENCE_CXX17_C_HEADER_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -168,8 +168,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)Common\src;$(ProjectDir)src</AdditionalIncludeDirectories>
-      <BufferSecurityCheck>
-      </BufferSecurityCheck>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -184,7 +183,7 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;_SILENCE_CXX17_C_HEADER_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -192,6 +191,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)Common\src;$(ProjectDir)src</AdditionalIncludeDirectories>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -219,6 +219,8 @@
     <ClInclude Include="src\platforms\steam\steamtypes.h" />
     <ClInclude Include="src\platforms\steam\steam_hooks.h" />
     <ClInclude Include="src\platforms\steam\steam_ordinals.h" />
+    <ClInclude Include="src\platforms\steam_client\SteamClient.h" />
+    <ClInclude Include="src\platforms\steam_client\steam_client_hooks.h" />
     <ClInclude Include="src\platforms\uplay_r1\UplayR1.h" />
     <ClInclude Include="src\platforms\uplay_r1\uplay_r1_hooks.h" />
     <ClInclude Include="src\platforms\uplay_r2\uplay_r2_hooks.h" />
@@ -239,6 +241,8 @@
     <ClCompile Include="src\platforms\epic\Epic.cpp" />
     <ClCompile Include="src\platforms\origin\origin_hooks.cpp" />
     <ClCompile Include="src\platforms\steam\steam_hooks.cpp" />
+    <ClCompile Include="src\platforms\steam_client\SteamClient.cpp" />
+    <ClCompile Include="src\platforms\steam_client\steam_client_hooks.cpp" />
     <ClCompile Include="src\platforms\uplay_r1\UplayR1.cpp" />
     <ClCompile Include="src\platforms\uplay_r1\uplay_r1_hooks.cpp" />
     <ClCompile Include="src\platforms\uplay_r2\uplay_r2_hooks.cpp" />
@@ -257,6 +261,9 @@
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{f364b2ab-f34a-4bcf-9362-22720020ddbf}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

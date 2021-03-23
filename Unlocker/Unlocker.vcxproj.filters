@@ -119,6 +119,12 @@
     <ClInclude Include="src\platforms\uplay_r1\uplay_r1_hooks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\platforms\steam_client\SteamClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platforms\steam_client\steam_client_hooks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -172,5 +178,14 @@
     <ClCompile Include="src\platforms\uplay_r1\uplay_r1_hooks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\platforms\steam_client\SteamClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platforms\steam_client\steam_client_hooks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

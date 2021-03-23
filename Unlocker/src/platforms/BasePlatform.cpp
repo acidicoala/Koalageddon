@@ -46,7 +46,7 @@ void BasePlatform::shutdown()
 		return;
 
 	logger->debug("Shutting down {} platform", getPlatformName());
-	
+
 	auto& hooks = getPlatformHooks();
 
 	for(auto& hook : hooks)
@@ -54,14 +54,33 @@ void BasePlatform::shutdown()
 		hook->unHook();
 	}
 	hooks.clear();
-	
+
 	logger->debug("{} platform was shut down", getPlatformName());
 }
 
+void BasePlatform::installDetourHook(void* hookedFunc, const char* funcName, void* funcAddress)
+{
+	logger->debug("Hooking {} at {}", funcName, funcAddress);
+
+	auto& hooks = getPlatformHooks();
+
+	hooks.push_back(make_unique<Detour>
+		((char*) funcAddress, (char*) hookedFunc, &trampolineMap[funcName], disassembler)
+	);
+
+	if(hooks.back()->hook())
+	{
+		logger->debug("Hooked '{}' via Detour.", funcName);
+	}
+	else
+	{
+		hooks.pop_back();
+		logger->error("Failed to hook '{}' via Detour.", funcName);
+	}
+}
 
 void BasePlatform::installDetourHook(void* hookedFunc, const char* funcName)
 {
-	
 	auto& hooks = getPlatformHooks();
 
 	if(auto original_func_address = GetProcAddress(handle, funcName))
@@ -72,14 +91,18 @@ void BasePlatform::installDetourHook(void* hookedFunc, const char* funcName)
 
 		if(hooks.back()->hook())
 		{
-			logger->debug("Hooked \"{}\" via Detour.", funcName);
+			logger->debug("Hooked '{}' via Detour.", funcName);
 		}
 		else
 		{
 			hooks.pop_back();
-			logger->warn("Failed to hook \"{}\" via Detour. Trying with IAT.", funcName);
+			logger->warn("Failed to hook '{}' via Detour. Trying with IAT.", funcName);
 			installIatHook(hookedFunc, funcName);
 		}
+	}
+	else
+	{
+		logger->error("Failed to find address of '{}' procedure", funcName);
 	}
 }
 

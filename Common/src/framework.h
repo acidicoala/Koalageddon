@@ -28,6 +28,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/null_sink.h>
 #include <nlohmann/json.hpp>
+#include <cpr/cpr.h> 
 #include <winreg/WinReg.hpp>
 #include <polyhook2/Detour/ADetour.hpp>
 #include <polyhook2/IHook.hpp>

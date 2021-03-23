@@ -1,22 +1,10 @@
 #include "pch.h"
 #include "Origin.h"
 #include "origin_hooks.h"
-#include "util.h"
+#include "constants.h"
 
-// Can't include it globally because it pollutes global namespace.
-// More specifically, the `interface` name is colliding with steam hooks
-#pragma warning(push) // Disable 3rd party library warnings
-#pragma warning(disable: ALL_CODE_ANALYSIS_WARNINGS)
-#include <codeanalysis\warnings.h>
-#include <cpr/cpr.h> 
-#pragma warning(pop)
-
-using nlohmann::json;
-
-constexpr auto url = "https://raw.githubusercontent.com/acidicoala/public-entitlements/main/origin/v1/entitlements.json";
-
-const auto XML_PATH = getWorkingDirPath() / "cache" / "origin-entitlements.xml";
-const auto ETAG_PATH = getWorkingDirPath() / "cache" / "origin-entitlements.etag";
+const auto XML_PATH = getCacheDirPath() / "origin-entitlements.xml";
+const auto ETAG_PATH = getCacheDirPath() / "origin-entitlements.etag";
 
 struct Entitlement
 {
@@ -46,7 +34,7 @@ void fetchEntitlements()
 		etag = "";
 
 	cpr::Response r = cpr::Get(
-		cpr::Url{ url },
+		cpr::Url{ origin_entitlements_url },
 		cpr::Header{ {"If-None-Match", etag} },
 		cpr::Timeout{ 3 * 1000 } // 3s
 	);
@@ -149,10 +137,9 @@ void Origin::platformInit()
 	installDetourHook(encrypt, mangled_encrypt);
 }
 
-string& Origin::getPlatformName()
+string Origin::getPlatformName()
 {
-	static string name = "Origin";
-	return name;
+	return "Origin";
 }
 
 

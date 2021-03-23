@@ -5,9 +5,9 @@
 #define GET_PROXY_FUNC(FUNC) \
 	static auto proxyFunc = PLH::FnCast(BasePlatform::trampolineMap[#FUNC], FUNC);
 
-auto getUplayR1Config()
+auto& getUplayR1Config()
 {
-	return config->platforms["Uplay R1"];
+	return config->platformRefs.UplayR1;
 }
 
 int UPLAY_USER_IsOwned(int aUplayId)

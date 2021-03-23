@@ -26,8 +26,8 @@ int main(int argc, char** argv)
 		auto PID = (DWORD) std::stoi(argv[1]);
 		auto dllPath = stow(argv[2]);
 
-		logger->info(L"Injecting DLL into \"{}\"", getProcessName(PID));
-		logger->debug(L"PID: {}, dllPath: \"{}\"", PID, dllPath);
+		logger->info(L"Injecting DLL into '{}'", getProcessName(PID));
+		logger->debug(L"PID: {}, dllPath: '{}'", PID, dllPath);
 
 		auto result = injectDLL(PID, dllPath);
 
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			logger->error("Failed to inject the DLL. Error code: 0x{0:}", result);
+			logger->error("Failed to inject the DLL. Error code: {}", (void*) result);
 		}
 
 		return result;

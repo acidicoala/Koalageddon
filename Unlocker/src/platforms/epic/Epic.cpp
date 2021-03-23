@@ -16,10 +16,9 @@ void Epic::platformInit()
 	HOOK(EOS_Ecom_Entitlement_Release);
 }
 
-string& Epic::getPlatformName()
+string Epic::getPlatformName()
 {
-	static string name = "Epic Games";
-	return name;
+	return "Epic Games";
 }
 
 
