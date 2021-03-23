@@ -36,9 +36,11 @@ wstring getProcessName(DWORD pid);
 path getCurrentProcessPath();
 string getCurrentProcessName();
 path getProcessPath(HANDLE handle);
+HANDLE getProcessHandle(string name, DWORD dwAccess = PROCESS_ALL_ACCESS);
 bool is32bit(DWORD PID);
 bool is32bit(HANDLE hProcess);
 void killProcess(HANDLE hProcess, DWORD sleepMS = 0);
+void killProcess(string name);
 string getModuleVersion(string filename);
 
 // String utils
@@ -52,8 +54,8 @@ string toLower(string str);
 bool stringsAreEqual(string one, string two, bool insensitive = false);
 
 // Registry
-wstring getReg(LPCWSTR key);
-void setReg(LPCWSTR key, LPCWSTR val);
+string getReg(string key, string valueName);
+void setReg(string key, string valueName, string data);
 path getWorkingDirPath();
 path getCacheDirPath();
 

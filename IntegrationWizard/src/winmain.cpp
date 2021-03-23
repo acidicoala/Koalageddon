@@ -5,59 +5,16 @@
 #include "IntegrationWizard.h"
 #include "../resource.h"
 
-Action askForAction(HINSTANCE hInstance)
-{
-	TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-	int nClickedBtn;
-	auto szTitle = L"Koalageddon";
-	auto szHeader = L"Welcome to the Koalageddon wizard. Please choose the desired action.";
-	LPCWSTR szBodyText =
-		L"The wizard will scan running processes to find target platforms. " \
-		L"During installation/removal target processes will be terminated, " \
-		L"so make sure to close all games and save all data.";
-
-	TASKDIALOG_BUTTON aCustomButtons[] = {
-	  { (int) Action::INSTALL_INTEGRATIONS, L"&Install platform integrations" },
-	  { (int) Action::REMOVE_INTEGRATIONS, L"&Remove platform integrations" }
-	};
-
-	tdc.hInstance = hInstance;
-	tdc.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_USE_COMMAND_LINKS | TDF_EXPAND_FOOTER_AREA;
-	tdc.pButtons = aCustomButtons;
-	tdc.cButtons = _countof(aCustomButtons);
-	tdc.pszWindowTitle = szTitle;
-	tdc.pszMainIcon = TD_INFORMATION_ICON;
-	tdc.pszMainInstruction = szHeader;
-	//tdc.pszContent = szBodyText;
-	tdc.pszExpandedInformation = szBodyText;
-
-	if(SUCCEEDED(TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL)))
-	{
-		logger->debug("Clicked button: {}", nClickedBtn);
-
-		if(nClickedBtn == (int) Action::INSTALL_INTEGRATIONS ||
-			nClickedBtn == (int) Action::REMOVE_INTEGRATIONS)
-			return (Action) nClickedBtn;
-		else
-			return Action::NO_ACTION;
-	}
-	else
-	{
-		return Action::UNEXPECTED_ERROR;
-	}
-
-}
-
 void fatalError(string message)
 {
-	message = fmt::format("{}. Error code: {}", message, (void*) GetLastError());
+	message = fmt::format("{}. Error code: 0x{:X}", message, GetLastError());
 	MessageBoxA(NULL, message.c_str(), "Fatal Error", MB_ICONERROR | MB_OK);
 	exit(1);
 }
 
 void firstSetup()
 {
-	setReg(WORKING_DIR, getCurrentProcessPath().parent_path().c_str());
+	setReg(KOALAGEDDON_KEY, WORKING_DIR, getCurrentProcessPath().parent_path().string());
 
 	auto configPath = getWorkingDirPath() / CONFIG_NAME;
 
@@ -115,6 +72,67 @@ void firstSetup()
 }
 
 
+void askForAction(
+	HINSTANCE hInstance,
+	map<int, IntegrationWizard::PlatformInstallation>& platforms,
+	Action* action,
+	int* platformID
+)
+{
+	TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+	auto szTitle = L"Koalageddon Wizard";
+	auto szHeader = L"Welcome to the Koalageddon wizard.";
+	auto szBodyText =
+		L"Please select the platform for which you wish to install/remove integrations";
+
+	LPCWSTR szExpandedInformation =
+		L"The wizard will scan windows registry to find target platforms. " \
+		L"During installation/removal platform processes will be terminated, " \
+		L"so make sure to close all games and save all data.";
+
+	vector<TASKDIALOG_BUTTON> radioButtons;
+	for(const auto& [key, platform] : platforms)
+		radioButtons.push_back(TASKDIALOG_BUTTON{ key, platform.name.c_str() });
+
+	if(radioButtons.size() > 1)
+		radioButtons.push_back(TASKDIALOG_BUTTON{ IntegrationWizard::ALL_PLATFORMS, L"All of the above" });
+
+	TASKDIALOG_BUTTON aCustomButtons[] = {
+	  { (int) Action::INSTALL_INTEGRATIONS, L"&Install platform integrations" },
+	  { (int) Action::REMOVE_INTEGRATIONS, L"&Remove platform integrations" }
+	};
+
+	LPCWSTR szFooter =
+		LR"(<a href="https://github.com/acidicoala/Koalageddon/releases">Download latest release</a>)";
+
+	tdc.hInstance = hInstance;
+	tdc.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_USE_COMMAND_LINKS | TDF_EXPAND_FOOTER_AREA | TDF_ENABLE_HYPERLINKS;
+	tdc.pButtons = aCustomButtons;
+	tdc.cButtons = _countof(aCustomButtons);
+	tdc.pszWindowTitle = szTitle;
+	tdc.pszMainIcon = TD_INFORMATION_ICON;
+	tdc.pszMainInstruction = szHeader;
+	tdc.cRadioButtons = (UINT) radioButtons.size();
+	tdc.nDefaultRadioButton = IntegrationWizard::ALL_PLATFORMS;
+	tdc.pRadioButtons = radioButtons.data();
+	tdc.pszContent = szBodyText;
+	tdc.pszExpandedInformation = szExpandedInformation;
+	tdc.pszFooter = szFooter;
+	tdc.pszFooterIcon = TD_INFORMATION_ICON;
+
+	if(SUCCEEDED(TaskDialogIndirect(&tdc, (int*) action, platformID, NULL)))
+	{
+		logger->debug("Clicked button: {}", *action);
+
+		if(*action != Action::INSTALL_INTEGRATIONS && *action != Action::REMOVE_INTEGRATIONS)
+			*action = Action::NO_ACTION;
+	}
+	else
+	{
+		*action = Action::UNEXPECTED_ERROR;
+	}
+}
+
 int APIENTRY wWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -132,7 +150,15 @@ int APIENTRY wWinMain(
 	void* oldVal = NULL;
 	Wow64DisableWow64FsRedirection(&oldVal);
 
-	auto action = askForAction(hInstance);
+	auto platforms = IntegrationWizard::getInstalledPlatforms();
+
+	Action action;
+	int platformID;
+
+	if(platforms.empty())
+		action = Action::NOTHING_TO_INSTALL;
+	else
+		askForAction(hInstance, platforms, &action, &platformID);
 
 	switch(action)
 	{
@@ -143,13 +169,14 @@ int APIENTRY wWinMain(
 			logger->info("No action was taken. Terminating.");
 			break;
 		case Action::INSTALL_INTEGRATIONS:
-			IntegrationWizard::install();
-			break;
 		case Action::REMOVE_INTEGRATIONS:
-			IntegrationWizard::remove();
+			IntegrationWizard::alterPlatform(action, platformID, platforms);
+			break;
+		case Action::NOTHING_TO_INSTALL:
+			MessageBox(NULL, L"Koalageddon did not find any installed platforms.", L"Nothing found", MB_ICONINFORMATION);
 			break;
 		default:
-			logger->error("Unexpected action result");
+			fatalError("Unexpected action result");
 	}
 
 	Wow64RevertWow64FsRedirection(oldVal);

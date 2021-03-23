@@ -2,134 +2,29 @@
 #include "IntegrationWizard.h"
 #include "Logger.h"
 #include "Config.h"
-#include "constants.h"
 
-vector<string> alteredPlatforms;
+using namespace IntegrationWizard;
 
+vector<wstring> IntegrationWizard::alteredPlatforms;
 
-/*
-Returns the path to original version.dll based on the architecture
-of the provided process handle.
-*/
-path getVersionDllPath(HANDLE hProcess)
+path getVersionDllPath(Architecture architecture)
 {
 	PWSTR rawPath;
-	auto folderID = is32bit(hProcess) ? FOLDERID_SystemX86 : FOLDERID_System;
+	auto folderID = architecture == Architecture::x32 ? FOLDERID_SystemX86 : FOLDERID_System;
 	SHGetKnownFolderPath(folderID, NULL, NULL, &rawPath);
 	auto systemPath = absolute(rawPath);
 	CoTaskMemFree(rawPath);
 	return systemPath / "version.dll";
 }
 
-// Source: https://docs.microsoft.com/en-us/windows/win32/psapi/enumerating-all-processes
-void enumerateProcesses(function<void(HANDLE hProcess, path processPath, string processName)> callback)
-{
-	DWORD aProcesses[1024], cbNeeded, cProcesses;
-
-	if(!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded))
-		showFatalError("Failed to enumerate processes.", true);
-
-	// Calculate how many process identifiers were returned.
-	cProcesses = cbNeeded / sizeof(DWORD);
-
-	logger->debug("Found running processes:");
-
-	// Print the name and process identifier for each process.
-	for(DWORD i = 0; i < cProcesses; i++)
-	{
-		auto pid = aProcesses[i];
-		if(pid == 0)
-			continue;
-
-		// Get a handle to the process.
-		HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
-
-		if(hProcess == NULL)
-			continue; // Not a big deal, just skip it.
-
-		try
-		{
-			auto processPath = getProcessPath(hProcess);
-			auto processName = processPath.filename().string();
-			logger->debug("\tName: '{}', pid: {}", processName, pid);
-
-			for(const auto& [key, platform] : config->platforms)
-			{
-				if(stringsAreEqual(processName, platform.process))
-				{
-					logger->info("Target process detected: '{}'", processName);
-					callback(hProcess, processPath, processName);
-				}
-			}
-		} catch(std::exception& ex)
-		{
-			logger->warn("Error in handling a process with PID: {}. Reason: {}", pid, ex.what());
-		}
-
-
-		CloseHandle(hProcess);
-	}
-}
-
-void installCallback(HANDLE hProcess, path processPath, string processName)
-{
-	try
-	{
-		logger->info("Installing platform integration");
-
-		auto originalDllPath = getVersionDllPath(hProcess);
-		auto originalVersionDllPath = processPath.parent_path() / "version_o.dll";
-		logger->debug("Original DLL path: '{}', Destination: '{}'", originalDllPath.string(), originalVersionDllPath.string());
-
-		auto integrationDllPath = getWorkingDirPath() / (is32bit(hProcess) ? INTEGRATION_32 : INTEGRATION_64);
-		auto versionDLLPath = processPath.parent_path() / "version.dll";
-		logger->debug("Integration DLL path: '{}', Destination: '{}'", integrationDllPath.string(), versionDLLPath.string());
-
-		// Terminate the process to release a possible lock on the files
-		killProcess(hProcess);
-
-		copy_file(originalDllPath, originalVersionDllPath, copy_options::overwrite_existing);
-		copy_file(integrationDllPath, versionDLLPath, copy_options::overwrite_existing);
-		
-		alteredPlatforms.push_back(processName);
-		logger->info("Platform integration was successfully installed");
-
-	} catch(std::exception& ex)
-	{
-		showFatalError(fmt::format("Failed to install integrations: {}", ex.what()), false);
-	}
-}
-
-void removeCallback(HANDLE hProcess, path processPath, string processName)
-{
-	try
-	{
-		logger->info("Removing platform integration");
-
-		auto versionDLLPath = stow((processPath.parent_path() / "version.dll").string());
-		auto originalDllPath = stow((processPath.parent_path() / "version_o.dll").string());
-		logger->debug(L"Version DLL path: '{}', Original DLL path: '{}'", versionDLLPath, originalDllPath);
-
-		// Terminate the process to release a lock on the files
-		killProcess(hProcess, 250);
-
-		DeleteFile(versionDLLPath.c_str());
-		DeleteFile(originalDllPath.c_str());
-
-		alteredPlatforms.push_back(processName);
-		logger->info("Platform integration was successfully removed");
-
-	} catch(std::exception& ex)
-	{
-		showFatalError(fmt::format("Failed to remove integrations: {}", ex.what()), false);
-	}
-}
-
 void showPostActionReport(Action action)
 {
+	auto actionedString = action == Action::INSTALL_INTEGRATIONS ? "installed" : "removed";
+
 	if(alteredPlatforms.size() == 0)
 	{
-		showInfo("No target processes were found. No actions were taken.", "Nothing found", true);
+		auto message = fmt::format("No platforms integrations were {}", actionedString);
+		showInfo(message, "No result", true);
 	}
 	else
 	{
@@ -137,29 +32,146 @@ void showPostActionReport(Action action)
 		for(const auto& target : alteredPlatforms)
 		{
 			auto symbol = action == Action::INSTALL_INTEGRATIONS ? "+" : "-";
-			targets += fmt::format("[{}] {}\n", symbol, target);
+			targets += fmt::format("[{}] {}\n", symbol, wtos(target));
 		}
 
 		auto actionStr = action == Action::INSTALL_INTEGRATIONS ? "installed" : "removed";
-		auto message = fmt::format("The following target platforms integrations were sucessfully {}:\n\n{}", actionStr, targets);
+		auto message = fmt::format(
+			"The following platform integrations were sucessfully {}:\n\n{}",
+			actionStr, targets
+		);
 		showInfo(message, "Success");
 	}
 }
 
-void IntegrationWizard::install()
+void installIntegration(const PlatformInstallation& platform)
 {
-	logger->info("Installing integrations");
+	auto originalDllPath = getVersionDllPath(platform.architecture);
+	auto originalVersionDllPath = platform.path / "version_o.dll";
+	logger->debug(
+		"Original DLL path: '{}', Destination: '{}'",
+		originalDllPath.string(), originalVersionDllPath.string()
+	);
 
-	enumerateProcesses(installCallback);
+	auto integrationDLL = platform.architecture == Architecture::x32 ? INTEGRATION_32 : INTEGRATION_64;
+	auto integrationDllPath = getWorkingDirPath() / integrationDLL;
+	auto versionDLLPath = platform.path / "version.dll";
+	logger->debug(
+		"Integration DLL path: '{}', Destination: '{}'",
+		integrationDllPath.string(), versionDLLPath.string()
+	);
 
-	showPostActionReport(Action::INSTALL_INTEGRATIONS);
+	// Terminate the process to release a possible lock on the files
+	killProcess(platform.process);
+
+	copy_file(originalDllPath, originalVersionDllPath, copy_options::overwrite_existing);
+	copy_file(integrationDllPath, versionDLLPath, copy_options::overwrite_existing);
 }
 
-void IntegrationWizard::remove()
+void removeIntegration(const PlatformInstallation& platform)
 {
-	logger->info("Removing integrations");
+	auto versionDLLPath = platform.path / "version.dll";
+	auto originalDllPath = platform.path / "version_o.dll";
+	logger->debug(
+		"Version DLL path: '{}', Original DLL path: '{}'",
+		versionDLLPath.string(), originalDllPath.string()
+	);
 
-	enumerateProcesses(removeCallback);
+	// Terminate the process to release potential locks on files
+	killProcess(platform.process);
 
-	showPostActionReport(Action::REMOVE_INTEGRATIONS);
+	DeleteFile(versionDLLPath.c_str());
+	DeleteFile(originalDllPath.c_str());
 }
+
+
+void safelyAlterPlatform(Action action, const PlatformInstallation& platform)
+{
+	auto actionString = action == Action::INSTALL_INTEGRATIONS ? "install" : "remove";
+	auto actioningString = action == Action::INSTALL_INTEGRATIONS ? "Installing" : "Removing";
+	auto actionedString = action == Action::INSTALL_INTEGRATIONS ? "installed" : "removed";
+
+	auto callback = action == Action::INSTALL_INTEGRATIONS ? installIntegration : removeIntegration;
+
+	try
+	{
+		logger->info("{} {} platform integration", actioningString, wtos(platform.name));
+		callback(platform);
+
+		alteredPlatforms.push_back(platform.name);
+		logger->info("Platform integration was successfully {}", actionedString);
+	} catch(std::exception& ex)
+	{
+		showFatalError(fmt::format(
+			"Failed to {} {} integrations: {}",
+			actionString, wtos(platform.name), ex.what()
+		), false);
+	}
+}
+
+void IntegrationWizard::alterPlatform(Action action, int platformID, map<int, PlatformInstallation> platforms)
+{
+	auto actioningString = action == Action::INSTALL_INTEGRATIONS ? "Installing" : "Removing";
+
+	logger->info("{} integrations", actioningString);
+
+	if(platformID == IntegrationWizard::ALL_PLATFORMS)
+	{
+		for(const auto& [key, platform] : platforms)
+		{
+			safelyAlterPlatform(action, platform);
+		}
+	}
+	else
+	{
+		safelyAlterPlatform(action, platforms[platformID]);
+	}
+
+	showPostActionReport(action);
+}
+
+map<string, PlatformRegistry> platformRegMap = {
+	// EA Desktop is not implemented. Yet...
+	// {EA_DESKTOP_NAME,	PlatformRegistry{ Architecture::x64, EA_DESKTOP_PROCESS,EA_DESKTOP_KEY,	EA_DESKTOP_VALUE}},
+	{EPIC_GAMES_32_NAME,PlatformRegistry{ Architecture::x32, EPIC_GAMES_PROCESS,EPIC_GAMES_KEY,	EPIC_GAMES_VALUE}},
+	{EPIC_GAMES_64_NAME,PlatformRegistry{ Architecture::x64, EPIC_GAMES_PROCESS,EPIC_GAMES_KEY,	EPIC_GAMES_VALUE}},
+	{ORIGIN_NAME,		PlatformRegistry{ Architecture::x32, ORIGIN_PROCESS,	ORIGIN_KEY,		ORIGIN_VALUE	}},
+	{STEAM_NAME,		PlatformRegistry{ Architecture::x32, STEAM_PROCESS,		STEAM_KEY,		STEAM_VALUE		}},
+	{UBISOFT_NAME,		PlatformRegistry{ Architecture::x32, UBISOFT_PROCESS,	UBISOFT_KEY,	UBISOFT_VALUE	}},
+};
+
+map<int, PlatformInstallation> IntegrationWizard::getInstalledPlatforms()
+{
+	map<int, PlatformInstallation> installedPlatforms;
+
+	int platformID = 1000;
+	for(const auto& [name, platformRegistry] : platformRegMap)
+	{
+		const auto& [architecture, process, key, value] = platformRegistry;
+
+		try
+		{
+			auto platformPath = absolute(getReg(key, value));
+
+			// Epic binaries are located in sub-directories
+			if(name == EPIC_GAMES_32_NAME)
+				platformPath /= R"(Launcher\Portal\Binaries\Win32)";
+			else if(name == EPIC_GAMES_64_NAME)
+				platformPath /= R"(Launcher\Portal\Binaries\Win64)";
+			else if(name == ORIGIN_NAME) // Origin stores path to exe
+				platformPath = platformPath.parent_path();
+
+			if(std::filesystem::exists(platformPath))
+				installedPlatforms[platformID++] = PlatformInstallation{ platformPath, architecture, process, stow(name) };
+		} catch(winreg::RegException& e)
+		{ // This is normal if platform is not installed
+			logger->warn(
+				"Failed to obtain platform path from registry. Key: {}, Value: {}, Message: {}, Code: {}",
+				key, value, e.what(), e.code().value()
+			);
+		}
+	}
+
+	return installedPlatforms;
+}
+

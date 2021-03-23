@@ -92,9 +92,32 @@ path getProcessPath(HANDLE handle)
 	return absolute(buffer);
 }
 
+// Source: https://stackoverflow.com/a/35288193/3805929
+HANDLE getProcessHandle(string name, DWORD dwAccess)
+{
+	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if(hSnap != INVALID_HANDLE_VALUE)
+	{
+		PROCESSENTRY32 pe;
+		ZeroMemory(&pe, sizeof(PROCESSENTRY32));
+		pe.dwSize = sizeof(PROCESSENTRY32);
+		Process32First(hSnap, &pe);
+		do
+		{
+			if(!lstrcmpi(pe.szExeFile, stow(name).c_str()))
+			{
+				return OpenProcess(dwAccess, 0, pe.th32ProcessID);
+			}
+		} while(Process32Next(hSnap, &pe));
+
+	}
+	return INVALID_HANDLE_VALUE;
+}
+
+
 path getWorkingDirPath()
 {
-	return absolute(getReg(WORKING_DIR));
+	return absolute(getReg(KOALAGEDDON_KEY, WORKING_DIR));
 }
 
 path getCacheDirPath()
@@ -135,14 +158,21 @@ void killProcess(HANDLE hProcess, DWORD sleepMS)
 	if(result != WAIT_OBJECT_0)
 	{
 		auto processName = getProcessPath(hProcess).string();
-		throw std::exception(fmt::format("Failed to terminate process: {}", processName).c_str());
+		showFatalError(fmt::format("Failed to terminate process: {}, result: {}", processName, result), false);
 	}
 	else
 	{
-		Sleep(sleepMS); // Some other process may still be locking the file
+		// Other satelite processes might still be locking files, so we wait a bit just to be sure
+		Sleep(sleepMS);
 	}
 }
 
+void killProcess(string name)
+{
+	auto handle = getProcessHandle(name);
+	if(handle != INVALID_HANDLE_VALUE)
+		killProcess(handle, 100);
+}
 
 // Source: https://stackoverflow.com/a/3999597/3805929
 
@@ -176,16 +206,16 @@ char* makeCStringCopy(string src)
 	return dest;
 }
 
-wstring getReg(LPCWSTR key)
+string getReg(string key, string valueName)
 {
-	static winreg::RegKey regKey{ HKEY_CURRENT_USER, L"SOFTWARE\\acidicoala\\Koalageddon" };
-	return regKey.GetStringValue(key);
+	winreg::RegKey regKey{ HKEY_LOCAL_MACHINE, stow(key).c_str() };
+	return wtos(regKey.GetStringValue(stow(valueName)));
 }
 
-void setReg(LPCWSTR key, LPCWSTR val)
+void setReg(string key, string valueName, string data)
 {
-	static winreg::RegKey regKey{ HKEY_CURRENT_USER, L"SOFTWARE\\acidicoala\\Koalageddon" };
-	regKey.SetStringValue(key, val);
+	winreg::RegKey regKey{ HKEY_LOCAL_MACHINE, stow(key).c_str() };
+	regKey.SetStringValue(stow(valueName), stow(data));
 }
 string readFileContents(string path)
 {
@@ -235,17 +265,18 @@ void showInfo(string message, string title, bool shouldLog)
 
 string getModuleVersion(string filename)
 {
-	auto lptstrFilename = stow(filename).c_str();
+	auto wFilename = stow(filename);
 
 	DWORD dwHandle;
-	DWORD dwLen = GetFileVersionInfoSize(lptstrFilename, &dwHandle);
+	DWORD dwLen = GetFileVersionInfoSize(wFilename.c_str(), &dwHandle);
 
 	LPBYTE lpBuffer = NULL;
 	UINT size = 0;
 	if(dwLen > 0)
 	{
 		BYTE* pbBuf = new BYTE[dwLen];
-		if(GetFileVersionInfo(lptstrFilename, dwHandle, dwLen, pbBuf))
+		dwHandle = NULL;
+		if(GetFileVersionInfo(wFilename.c_str(), dwHandle, dwLen, pbBuf))
 		{
 			if(VerQueryValue(pbBuf, L"\\", (LPVOID*) &lpBuffer, &size))
 			{

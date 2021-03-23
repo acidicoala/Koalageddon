@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			logger->error("Failed to inject the DLL. Error code: {}", (void*) result);
+			logger->error("Failed to inject the DLL. Error code: 0x{:X}", result);
 		}
 
 		return result;
