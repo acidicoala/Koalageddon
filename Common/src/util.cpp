@@ -117,7 +117,19 @@ HANDLE getProcessHandle(string name, DWORD dwAccess)
 
 path getWorkingDirPath()
 {
-	return absolute(getReg(KOALAGEDDON_KEY, WORKING_DIR));
+	try
+	{
+		return absolute(getReg(KOALAGEDDON_KEY, WORKING_DIR));
+	} catch(std::exception& e)
+	{
+		auto message = fmt::format(
+			"Failed to read Koalageddon working directory from the registry.\n"\
+			"You have to run the Integration Wizard to fix this issue.\n" \
+			"Exception message: {}", e.what()
+		);
+		showFatalError(message, true);
+		return "";
+	}
 }
 
 path getCacheDirPath()
@@ -208,15 +220,17 @@ char* makeCStringCopy(string src)
 
 string getReg(string key, string valueName)
 {
-	winreg::RegKey regKey{ HKEY_LOCAL_MACHINE, stow(key).c_str() };
+	winreg::RegKey regKey{ HKEY_LOCAL_MACHINE, stow(key).c_str(), KEY_READ };
 	return wtos(regKey.GetStringValue(stow(valueName)));
 }
 
+// Should be called only from InstallationWizard, since writing to HKLM requires admin rights.
 void setReg(string key, string valueName, string data)
 {
-	winreg::RegKey regKey{ HKEY_LOCAL_MACHINE, stow(key).c_str() };
+	winreg::RegKey regKey{ HKEY_LOCAL_MACHINE, stow(key).c_str(), KEY_ALL_ACCESS };
 	regKey.SetStringValue(stow(valueName), stow(data));
 }
+
 string readFileContents(string path)
 {
 	std::ifstream fileStream(path);

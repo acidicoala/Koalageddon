@@ -10,7 +10,6 @@ HMODULE hUnlocker = NULL;
 
 void init(HMODULE hModule)
 {
-
 	Logger::init("Integration", true);
 	logger->info("Integration v{}", VERSION);
 

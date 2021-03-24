@@ -95,7 +95,7 @@ void safelyAlterPlatform(Action action, const PlatformInstallation& platform)
 
 	try
 	{
-		logger->info("{} {} platform integration", actioningString, wtos(platform.name));
+		logger->info("{} '{}' platform integration", actioningString, wtos(platform.name));
 		callback(platform);
 
 		alteredPlatforms.push_back(platform.name);
