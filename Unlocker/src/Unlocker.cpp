@@ -1,10 +1,10 @@
 #include "pch.h"
 #include "Unlocker.h"
-#include "constants.h"
+#include "Config.h"
 #include "constants.h"
 #include "DLLMonitor.h"
 #include "ProcessHooker.h"
-#include "Config.h"
+#include "UpdateChecker.h"
 
 static bool initialized = false;
 
@@ -25,6 +25,8 @@ void Unlocker::init(HMODULE hModule)
 
 	logger->info("Unlocker v{}", VERSION);
 	logger->info("Hooking into '{}'", getCurrentProcessName());
+
+	UpdateChecker::checkForUpdates();
 
 	DLLMonitor::init();
 	ProcessHooker::init();

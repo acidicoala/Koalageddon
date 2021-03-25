@@ -231,6 +231,7 @@
     <ClInclude Include="src\ProcessHooker.h" />
     <ClInclude Include="src\platforms\steam\Steam.h" />
     <ClInclude Include="src\platforms\uplay_r2\UplayR2.h" />
+    <ClInclude Include="src\UpdateChecker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\PatternMatcher.cpp" />
@@ -258,6 +259,7 @@
     <ClCompile Include="src\ProcessHooker.cpp" />
     <ClCompile Include="src\platforms\steam\Steam.cpp" />
     <ClCompile Include="src\platforms\uplay_r2\UplayR2.cpp" />
+    <ClCompile Include="src\UpdateChecker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">

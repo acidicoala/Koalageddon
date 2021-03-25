@@ -1,6 +1,6 @@
 {
 	"config_version": 3, // DO NOT EDIT THIS VALUE
-	"log_level": "debug",
+	"log_level": "info",
 	"platforms": {
 		"Steam": {
 			"enabled": true,
