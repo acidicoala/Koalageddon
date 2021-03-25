@@ -70,7 +70,7 @@ void BasePlatform::installDetourHook(void* hookedFunc, const char* funcName, voi
 
 	if(hooks.back()->hook())
 	{
-		logger->debug("Hooked '{}' via Detour.", funcName);
+		logger->info("Hooked '{}' via Detour.", funcName);
 	}
 	else
 	{
@@ -91,7 +91,7 @@ void BasePlatform::installDetourHook(void* hookedFunc, const char* funcName)
 
 		if(hooks.back()->hook())
 		{
-			logger->debug("Hooked '{}' via Detour.", funcName);
+			logger->info("Hooked '{}' via Detour.", funcName);
 		}
 		else
 		{
@@ -116,7 +116,7 @@ void BasePlatform::installIatHook(void* hookedFunc, const char* funcName)
 
 	if(hooks.back()->hook())
 	{
-		logger->debug("Hooked \"{}\" via IAT", funcName);
+		logger->debug("info '{}' via IAT", funcName);
 	}
 	else
 	{

@@ -318,3 +318,12 @@ string getModuleVersion(string filename)
 
 }
 
+MODULEINFO getModuleInfo(HMODULE hModule)
+{
+	// TODO: Error checks?
+
+	MODULEINFO moduleInfo = { NULL };
+	GetModuleInformation(GetCurrentProcess(), hModule, &moduleInfo, sizeof(moduleInfo));
+
+	return moduleInfo;
+}

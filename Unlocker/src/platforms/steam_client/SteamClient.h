@@ -4,12 +4,13 @@
 class SteamClient : public BasePlatform
 {
 protected:
-	const path OFFSETS_PATH = getCacheDirPath() / "steamclient-offsets.json";
+	const path PATTERNS_FILE_PATH = getCacheDirPath() / "steamclient-patterns.json";
 	
-	map<string, map<string, UINT32>> offsets;
+	map<string, string> patterns;
 	
-	void fetchAndCacheOffsets();
-	void readCachedOffsets();
+	void fetchAndCachePatterns();
+	void readCachedPatterns();
+	void installHook(void* hookedFunc, string funcName);
 	void installHooks();
 
 	void platformInit() override;

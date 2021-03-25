@@ -204,6 +204,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\PatternMatcher.h" />
     <ClInclude Include="src\platforms\origin\Origin.h" />
     <ClInclude Include="src\hook_util.h" />
     <ClInclude Include="src\DLLMonitor.h" />
@@ -232,6 +233,7 @@
     <ClInclude Include="src\platforms\uplay_r2\UplayR2.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\PatternMatcher.cpp" />
     <ClCompile Include="src\platforms\origin\Origin.cpp" />
     <ClCompile Include="src\hook_util.cpp" />
     <ClCompile Include="src\DLLMonitor.cpp" />

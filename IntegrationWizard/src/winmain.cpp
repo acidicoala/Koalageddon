@@ -33,7 +33,7 @@ void firstSetup()
 		return;
 	}
 
-	auto size = SizeofResource(nullptr, hResource);
+	auto dataSize = SizeofResource(nullptr, hResource);
 	auto dataPtr = LockResource(hMemory);
 
 	if(std::filesystem::exists(configPath))
@@ -48,7 +48,7 @@ void firstSetup()
 		auto configJson = nlohmann::json::parse(ifs, nullptr, true, true);
 		auto logLevel = configJson["config_version"].get<int>();
 
-		auto is = std::istringstream(string((char*) dataPtr));
+		auto is = std::istringstream(string((char*) dataPtr, dataSize));
 		auto defaultConfigJson = nlohmann::json::parse(is, nullptr, true, true);
 		auto defaultLogLevel = defaultConfigJson["config_version"].get<int>();
 
@@ -65,7 +65,7 @@ void firstSetup()
 		return;
 	}
 
-	configFile.write((char*) dataPtr, size);
+	configFile.write((char*) dataPtr, dataSize);
 	configFile.close();
 
 
@@ -119,6 +119,15 @@ void askForAction(
 	tdc.pszExpandedInformation = szExpandedInformation;
 	tdc.pszFooter = szFooter;
 	tdc.pszFooterIcon = TD_INFORMATION_ICON;
+	tdc.pfCallback = [](HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LONG_PTR lpRefData)->HRESULT
+	{
+		if(msg == TDN_HYPERLINK_CLICKED)
+		{
+			ShellExecute(NULL, L"open", (LPCWSTR) lParam, NULL, NULL, SW_SHOWNORMAL);
+		}
+
+		return S_OK;
+	};
 
 	if(SUCCEEDED(TaskDialogIndirect(&tdc, (int*) action, platformID, NULL)))
 	{

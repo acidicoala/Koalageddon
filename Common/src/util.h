@@ -42,6 +42,7 @@ bool is32bit(HANDLE hProcess);
 void killProcess(HANDLE hProcess, DWORD sleepMS = 0);
 void killProcess(string name);
 string getModuleVersion(string filename);
+MODULEINFO getModuleInfo(HMODULE hModule);
 
 // String utils
 string wtos(const wstring& wstr);
@@ -66,7 +67,6 @@ bool writeFileContents(path filePath, string contents);
 // Message Box helpers
 void showFatalError(string message, bool terminate);
 void showInfo(string message, string title = "Information", bool shouldLog = false);
-
 
 template<typename T>
 bool vectorContains(vector<T> elements, T element)

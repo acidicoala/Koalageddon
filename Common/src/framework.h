@@ -15,6 +15,7 @@
 #include <memory>
 #include <regex>
 #include <thread>
+#include <chrono>
 
 // Following definitions are required for static build of libcurl
 #pragma comment(lib,"Ws2_32.lib")

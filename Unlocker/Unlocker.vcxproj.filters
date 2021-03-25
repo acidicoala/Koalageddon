@@ -125,6 +125,9 @@
     <ClInclude Include="src\platforms\steam_client\steam_client_hooks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\PatternMatcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -182,6 +185,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\platforms\steam_client\steam_client_hooks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PatternMatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -23,7 +23,7 @@
 				"67379" // Darkness II Low Violence [Do not censor violence]
 			]
 		},
-		"Epic Games": {
+		"EpicGames": {
 			"enabled": true,
 			"process": "EpicGamesLauncher.exe",
 			"replicate": true,
@@ -46,7 +46,7 @@
 				// "SIMS4.OFF.SOLP.0x0000000000030553" // Sims 4: Get Famous [Better stay anonymous]
 			]
 		},
-		"Uplay R1": {
+		"UplayR1": {
 			"enabled": true,
 			"process": "upc.exe",
 			"replicate": true,

@@ -25,7 +25,7 @@ constexpr auto STEAM_CLIENT = L"steamclient.dll";
 constexpr auto ORIGINCLIENT = L"OriginClient.dll";
 
 constexpr auto origin_entitlements_url = "https://raw.githubusercontent.com/acidicoala/public-entitlements/main/origin/v1/entitlements.json";
-constexpr auto steamclient_offsets_url = "https://raw.githubusercontent.com/acidicoala/public-entitlements/main/koalageddon/v1/steamclient.json";
+constexpr auto steamclient_patterns_url = "https://raw.githubusercontent.com/acidicoala/public-entitlements/main/koalageddon/v1/steamclient-patterns.json";
 
 // Registry
 constexpr auto KOALAGEDDON_KEY = R"(SOFTWARE\acidicoala\Koalageddon)";

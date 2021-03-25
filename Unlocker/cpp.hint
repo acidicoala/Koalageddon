@@ -4,3 +4,5 @@
 #define HOOK_SPEC(TYPE)
 #define PARAMS(...)
 #define ARGS(...)
+#define NOINLINE __attribute__((noinline))
+#define NOINLINE __declspec(noinline)

@@ -2,75 +2,92 @@
 #include "SteamClient.h"
 #include "steam_client_hooks.h"
 #include "constants.h"
+#include "PatternMatcher.h"
 
-void SteamClient::fetchAndCacheOffsets()
+void SteamClient::fetchAndCachePatterns()
 {
-	logger->debug("Fetching SteamClient offsets");
+	logger->debug("Fetching SteamClient patterns");
 
 	// Fetch offsets
 	cpr::Response r = cpr::Get(
-		cpr::Url{ steamclient_offsets_url },
+		cpr::Url{ steamclient_patterns_url },
 		cpr::Timeout{ 3 * 1000 } // 3s
 	);
 
 	if(r.status_code != 200)
 	{
-		logger->error("Failed to fetch SteamClient offsets: {} - {}", r.error.code, r.error.message);
+		logger->error("Failed to fetch SteamClient patterns: {} - {}", r.error.code, r.error.message);
 		return;
 	}
 
 	// Cache offsets
-	if(writeFileContents(OFFSETS_PATH, r.text))
-		logger->info("SteamClient offsets were successfully fetched and cached");
+	if(writeFileContents(PATTERNS_FILE_PATH, r.text))
+		logger->info("SteamClient patterns were successfully fetched and cached");
 	else
-		logger->error("Failed to cached SteamClient offsets");
+		logger->error("Failed to cache SteamClient patterns");
 }
 
-void SteamClient::readCachedOffsets()
+void SteamClient::readCachedPatterns()
 {
-	logger->debug("Reading SteamClient offsets from cache");
+	logger->debug("Reading SteamClient patterns from cache");
 
-	auto text = readFileContents(OFFSETS_PATH.string());
+	auto text = readFileContents(PATTERNS_FILE_PATH.string());
 
 	if(text.empty())
 	{
-		logger->error("No cached SteamClient offsets were found");
+		logger->error("No cached SteamClient patterns were found");
 		return;
 	}
 
 	try
 	{
 		// Parse json into our vector
-		json::parse(text, nullptr, true, true).get_to(offsets);
+		json::parse(text, nullptr, true, true).get_to(patterns);
 	} catch(json::exception& ex)
 	{
-		logger->error("Error parsing SteamClient json: {}", ex.what());
+		logger->error("Error parsing {}: {}", PATTERNS_FILE_PATH.string(), ex.what());
 		return;
 	}
 
-	logger->info("SteamClient offsets were successfully read from file");
+	logger->info("SteamClient patterns were successfully read from file");
+}
+
+void SteamClient::installHook(void* hookedFunc, string funcName)
+{
+	static auto moduleInfo = getModuleInfo(handle);
+	auto& [lpBaseOfDll, SizeOfImage, EntryPoint] = moduleInfo;
+
+	auto& pattern = patterns[funcName];
+
+	logger->debug("'{}' search pattern: '{}'", funcName, pattern);
+
+
+	auto t1 = std::chrono::high_resolution_clock::now();
+	auto origFuncAddress = PatternMatcher::scanInternal((PCSTR) lpBaseOfDll, SizeOfImage, pattern);
+	auto t2 = std::chrono::high_resolution_clock::now();
+
+	double elapsedTime = std::chrono::duration<double, std::milli>(t2 - t1).count();
+	logger->debug("'{}' address: {}. Search time: {:.2f} ms", funcName, origFuncAddress, elapsedTime);
+
+	if(origFuncAddress != nullptr)
+		installDetourHook(hookedFunc, funcName.c_str(), origFuncAddress);
 }
 
 void SteamClient::installHooks()
 {
-	map<string, UINT32> latestOffsets;
-	auto dllVersion = getModuleVersion("steamclient.dll");
+	logger->info("steamclient.dll version: {}", getModuleVersion("steamclient.dll"));
 
-	logger->info("steamclient.dll version: {}", dllVersion);
-
-	try
-	{
-		latestOffsets = offsets.at(dllVersion);
-	} catch(std::out_of_range&)
-	{
-		// Steamclient has been updated, but offsets have not been updated yet
-		// Try again next day ¯\_(ツ)_/¯
-		logger->error("Unsupported Steamclient version. Wait for acidicoala to add support for it.");
-		return;
-	}
-#define HOOK(FUNC) installDetourHook(FUNC, #FUNC, (void*)(latestOffsets[#FUNC] + (UINT32) handle))
+#define HOOK(FUNC) installHook(FUNC, #FUNC)
 
 #ifndef _WIN64 // Suppress the pointer size warnings on x64
+
+	// We first try to hook Family Sharing functions,
+	// since it is critical to hook them before they are called
+	if(config->platformRefs.Steam.unlock_shared_library)
+	{ 
+		HOOK(SharedLibraryLockStatus);
+		HOOK(SharedLibraryStopPlaying);
+	}
 	if(!config->platformRefs.Steam.replicate)
 	{
 		HOOK(IsAppDLCEnabled);
@@ -78,13 +95,7 @@ void SteamClient::installHooks()
 		HOOK(GetDLCDataByIndex);
 	}
 
-	if(config->platformRefs.Steam.unlock_shared_library)
-	{
-		HOOK(SharedLibraryLockStatus);
-		HOOK(SharedLibraryStopPlaying);
-	}
 #endif
-
 }
 
 void SteamClient::platformInit()
@@ -98,23 +109,22 @@ void SteamClient::platformInit()
 	}
 
 	// Execute blocking operations in a new thread
-	std::thread fetchingThread([&]{
-		logger->debug("Steamclient hooks: thread started");
+	std::thread hooksThread([&]{
+		std::thread fetchingThread([&]{ fetchAndCachePatterns(); });
+		readCachedPatterns();
 
-		/*
-		Here we read cached offsets twice since the https request might take too long,
-		and it will be too late to patch steam. Hence we also read them before fetching
-		since in most cases, valid offsets will be cached.
-		*/
-
-		readCachedOffsets(); // If there are cached offsets
-		fetchAndCacheOffsets();
-		readCachedOffsets(); // If there are no cached offsets
+		if(patterns.size() == 0)
+		{ // No cached patterns, hence we fetch them synchronously
+			fetchingThread.join();
+			readCachedPatterns();
+		}
+		else
+		{ // Patterns were cached, hence we fetch them asynchronously
+			fetchingThread.detach();
+		}
 		installHooks();
-
-		logger->debug("Steamclient hooks: thread finished");
 	});
-	fetchingThread.detach();
+	hooksThread.detach();
 
 #endif
 }
