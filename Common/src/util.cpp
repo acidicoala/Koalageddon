@@ -220,14 +220,14 @@ char* makeCStringCopy(string src)
 
 string getReg(string key, string valueName)
 {
-	winreg::RegKey regKey{ HKEY_LOCAL_MACHINE, stow(key).c_str(), KEY_READ };
+	winreg::RegKey regKey{ HKEY_LOCAL_MACHINE, stow(key).c_str(), KEY_WOW64_32KEY | KEY_READ };
 	return wtos(regKey.GetStringValue(stow(valueName)));
 }
 
 // Should be called only from InstallationWizard, since writing to HKLM requires admin rights.
 void setReg(string key, string valueName, string data)
 {
-	winreg::RegKey regKey{ HKEY_LOCAL_MACHINE, stow(key).c_str(), KEY_ALL_ACCESS };
+	winreg::RegKey regKey{ HKEY_LOCAL_MACHINE, stow(key).c_str(), KEY_WOW64_32KEY | KEY_ALL_ACCESS };
 	regKey.SetStringValue(stow(valueName), stow(data));
 }
 
