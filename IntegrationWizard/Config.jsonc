@@ -6,7 +6,7 @@
 			"enabled": true,
 			"process": "steam.exe",
 			"replicate": false,
-			"unlock_shared_library": true,
+			"unlock_shared_library": false,
 			"ignore": [
 				"x86launcher.exe",
 				"x64launcher.exe",
