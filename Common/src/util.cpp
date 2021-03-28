@@ -10,6 +10,14 @@ bool contains(wstring haystack, wstring needle)
 	return haystack.find(needle) != wstring::npos;
 }
 
+bool contains(string haystack, string needle, bool insensitive)
+{
+	if(insensitive)
+		return toLower(haystack).find(toLower(needle)) != string::npos;
+	else
+		return haystack.find(needle) != string::npos;
+}
+
 bool startsWith(string word, string prefix)
 {
 	return word.find(prefix, 0) == 0;

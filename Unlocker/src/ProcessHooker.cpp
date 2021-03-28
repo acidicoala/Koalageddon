@@ -136,15 +136,8 @@ void injectIfNecessary(wstring cmdLine, LPPROCESS_INFORMATION lpProcessInformati
 	// Iterate over platforms
 	for(const auto& [key, platform] : config->platforms)
 	{
-		if(stringsAreEqual(getCurrentProcessName(), platform.process))
+		if(stringsAreEqual(getCurrentProcessName(), platform.process, true))
 		{
-			// This is a platform process
-			if(!platform.replicate)
-			{
-				// Do not inject since platform is configured with disabled replication
-				logger->debug("Skipping injection since platform is set to disable replication");
-				return;
-			}
 			for(const auto& ignoredProcess : platform.ignore)
 			{
 				if(stringsAreEqual(newProcName, ignoredProcess))
@@ -153,6 +146,27 @@ void injectIfNecessary(wstring cmdLine, LPPROCESS_INFORMATION lpProcessInformati
 					logger->debug("Skipping injection since the new process is ignored for this platform");
 					return;
 				}
+			}
+			// Special case of Steam->Uplay integration
+			if(contains(wtos(cmdLine), "uplay_steam_mode"))
+			{
+				if(!config->platformRefs.UplayR1.replicate)
+				{
+					logger->debug("Skipping injection since Uplay replication is disabled");
+					return;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			// This is a platform process
+			if(!platform.replicate)
+			{
+				// Do not inject since platform is configured with disabled replication
+				logger->debug("Skipping injection since {} replication is disabled", key);
+				return;
 			}
 		}
 	}

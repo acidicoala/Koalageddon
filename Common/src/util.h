@@ -48,6 +48,7 @@ MODULEINFO getModuleInfo(HMODULE hModule);
 string wtos(const wstring& wstr);
 wstring stow(const string& wstr);
 char* makeCStringCopy(string src);
+bool contains(string haystack, string needle, bool insensitive = true);
 bool contains(wstring haystack, wstring needle);
 bool startsWith(string word, string prefix);
 bool endsWith(string word, string postfix);
