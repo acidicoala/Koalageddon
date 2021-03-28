@@ -55,7 +55,11 @@ void BasePlatform::shutdown()
 			hook->unHook();
 		}
 	}
-	
+	else
+	{
+		logger->debug(L"Skipping unhooking because the {} is unloaded", getModuleName());
+	}
+
 	hooks.clear();
 
 	logger->debug("{} platform was shut down", getPlatformName());

@@ -41,7 +41,7 @@ string toLower(string str)
 bool stringsAreEqual(string one, string two, bool insensitive)
 {
 	if(insensitive)
-		return _stricmp(one.c_str(), two.c_str());
+		return _stricmp(one.c_str(), two.c_str()) == 0;
 	else
 		return toLower(one) == toLower(two);
 }
