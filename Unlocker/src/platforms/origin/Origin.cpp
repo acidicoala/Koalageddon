@@ -139,9 +139,13 @@ void Origin::platformInit()
 
 string Origin::getPlatformName()
 {
-	return "Origin";
+	return ORIGIN_NAME;
 }
 
+LPCWSTR Origin::getModuleName()
+{
+	return ORIGINCLIENT;
+}
 
 Hooks& Origin::getPlatformHooks()
 {

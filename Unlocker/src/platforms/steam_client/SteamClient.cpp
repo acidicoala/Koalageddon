@@ -131,7 +131,12 @@ void SteamClient::platformInit()
 
 string SteamClient::getPlatformName()
 {
-	return "SteamClient";
+	return STEAM_CLIENT_NAME;
+}
+
+LPCWSTR SteamClient::getModuleName()
+{
+	return STEAM_CLIENT;
 }
 
 Hooks& SteamClient::getPlatformHooks()

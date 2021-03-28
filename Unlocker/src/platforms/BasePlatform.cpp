@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "BasePlatform.h"
 
-// TODO: Make constructor?
 void BasePlatform::init()
 {
 	if(initialized || handle == NULL)
@@ -49,10 +48,14 @@ void BasePlatform::shutdown()
 
 	auto& hooks = getPlatformHooks();
 
-	for(auto& hook : hooks)
-	{
-		hook->unHook();
+	if(GetModuleHandle(getModuleName()))
+	{ // Unhook only if the module is still loaded
+		for(auto& hook : hooks)
+		{
+			hook->unHook();
+		}
 	}
+	
 	hooks.clear();
 
 	logger->debug("{} platform was shut down", getPlatformName());

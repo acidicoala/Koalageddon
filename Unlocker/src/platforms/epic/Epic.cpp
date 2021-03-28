@@ -5,7 +5,7 @@
 #include "eos_hooks.h"
 
 // Macro to avoid repetition
-# define HOOK(FUNC) installDetourHook(FUNC, STR_##FUNC)
+#define HOOK(FUNC) installDetourHook(FUNC, STR_##FUNC)
 
 void Epic::platformInit()
 {
@@ -18,9 +18,13 @@ void Epic::platformInit()
 
 string Epic::getPlatformName()
 {
-	return "Epic Games";
+	return EPIC_GAMES_NAME;
 }
 
+LPCWSTR Epic::getModuleName()
+{
+	return EOSSDK;
+}
 
 Hooks& Epic::getPlatformHooks()
 {

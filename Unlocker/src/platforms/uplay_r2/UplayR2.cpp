@@ -13,9 +13,13 @@ void UplayR2::platformInit()
 
 string UplayR2::getPlatformName()
 {
-	return "Uplay R2";
+	return "Uplay R2"; // STUB
 }
 
+LPCWSTR UplayR2::getModuleName()
+{
+	return L"uplay_r2.dll"; // STUB
+}
 
 Hooks& UplayR2::getPlatformHooks()
 {

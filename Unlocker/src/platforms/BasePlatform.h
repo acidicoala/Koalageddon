@@ -23,6 +23,7 @@ protected:
 
 	virtual void platformInit() = 0;
 	virtual string getPlatformName() = 0;
+	virtual LPCWSTR getModuleName() = 0;
 	virtual Hooks& getPlatformHooks() = 0;
 public:
 	void init();

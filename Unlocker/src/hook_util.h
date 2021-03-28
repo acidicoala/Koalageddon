@@ -11,7 +11,7 @@ extern PLH::CapstoneDisassembler disassembler;
 
 /**
  * By default, virtual functions are declared with __thiscall
- * convention, which is normal since  they are class members.
+ * convention, which is normal since they are class members.
  * But it presents an issue for us, since we cannot pass *this
  * pointer as a function argument. This is because *this
  * pointer is passed via register ECX in __thiscall
