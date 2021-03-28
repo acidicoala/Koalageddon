@@ -101,8 +101,8 @@ void SteamClient::installHooks()
 void SteamClient::platformInit()
 {
 #ifndef _WIN64 // No point in x86-64 since Steam.exe is x86.
-
-	if(stringsAreEqual(getCurrentProcessName(), config->platformRefs.Steam.process, true))
+	logger->debug("Current process: {}, Steam process: {}", getCurrentProcessName(), config->platformRefs.Steam.process);
+	if(!stringsAreEqual(getCurrentProcessName(), config->platformRefs.Steam.process, true))
 	{
 		logger->debug("Ignoring hooks since this is not a Steam process");
 		return;
