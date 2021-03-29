@@ -46,14 +46,14 @@ void firstSetup()
 		}
 
 		auto configJson = nlohmann::json::parse(ifs, nullptr, true, true);
-		auto logLevel = configJson["config_version"].get<int>();
+		auto configVersion = configJson["config_version"].get<int>();
 
 		auto is = std::istringstream(string((char*) dataPtr, dataSize));
 		auto defaultConfigJson = nlohmann::json::parse(is, nullptr, true, true);
-		auto defaultLogLevel = defaultConfigJson["config_version"].get<int>();
+		auto defaultConfigVersion = defaultConfigJson["config_version"].get<int>();
 
 		// Do not copy if the log versions are matching
-		if(logLevel == defaultLogLevel)
+		if(configVersion == defaultConfigVersion)
 			return;
 	}
 

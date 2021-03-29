@@ -51,7 +51,7 @@ void BasePlatform::shutdown()
 	if(GetModuleHandle(getModuleName()))
 	{ // Unhook only if the module is still loaded
 		for(auto& hook : hooks)
-		{
+		{ // Deletes the underlying object (calls destructor, which calls unHook())
 			hook.reset();
 		}
 	}
@@ -59,7 +59,7 @@ void BasePlatform::shutdown()
 	{
 		logger->debug(L"Skipping unhooking because the {} is unloaded", getModuleName());
 		for(auto& hook : hooks)
-		{
+		{ // Does not delete the object, hence unHook() is not called
 			hook.release();
 		}
 	}
