@@ -9,10 +9,7 @@ void SteamClient::fetchAndCachePatterns()
 	logger->debug("Fetching SteamClient patterns");
 
 	// Fetch offsets
-	cpr::Response r = cpr::Get(
-		cpr::Url{ steamclient_patterns_url },
-		cpr::Timeout{ 3 * 1000 } // 3s
-	);
+	auto r = fetch(steamclient_patterns_url);
 
 	if(r.status_code != 200)
 	{

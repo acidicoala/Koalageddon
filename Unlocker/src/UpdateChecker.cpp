@@ -7,10 +7,7 @@ void UpdateChecker::checkForUpdates()
 {
 	std::thread([](){
 		// Fetch offsets
-		cpr::Response r = cpr::Get(
-			cpr::Url{ latest_release_url_api },
-			cpr::Timeout{ 3 * 1000 } // 3s
-		);
+		auto r = fetch(latest_release_url_api);
 
 		if(r.status_code != 200)
 		{

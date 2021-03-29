@@ -76,3 +76,15 @@ bool vectorContains(vector<T> elements, T element)
 {
 	return std::find(elements.begin(), elements.end(), element) != elements.end();
 }
+
+// Requests
+template <typename... Ts>
+cpr::Response fetch(string url, Ts&&... ts)
+{
+	return cpr::Get(
+		cpr::Url{ url },
+		cpr::Timeout{ 3 * 1000 }, // 3s
+		cpr::VerifySsl{ false },
+		std::forward<Ts>(ts)...
+	);
+}

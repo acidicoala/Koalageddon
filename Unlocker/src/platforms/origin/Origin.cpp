@@ -33,11 +33,7 @@ void fetchEntitlements()
 	if(xml.empty())
 		etag = "";
 
-	cpr::Response r = cpr::Get(
-		cpr::Url{ origin_entitlements_url },
-		cpr::Header{ {"If-None-Match", etag} },
-		cpr::Timeout{ 3 * 1000 } // 3s
-	);
+	auto r = fetch(origin_entitlements_url, cpr::Header{ {"If-None-Match", etag} });
 
 	if(r.status_code == 304)
 	{
