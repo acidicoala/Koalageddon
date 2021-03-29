@@ -2,8 +2,6 @@
 #include "framework.h"
 #include "util.h"
 
-constexpr auto CONFIG_NAME = "Config.jsonc";
-
 struct Platform
 {
 	bool enabled = true;

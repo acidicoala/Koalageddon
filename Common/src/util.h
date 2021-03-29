@@ -59,7 +59,9 @@ bool stringsAreEqual(string one, string two, bool insensitive = false);
 string getReg(string key, string valueName);
 void setReg(string key, string valueName, string data);
 path getWorkingDirPath();
+path getInstallDirPath();
 path getCacheDirPath();
+path getConfigPath();
 
 // File access
 string readFileContents(string path);

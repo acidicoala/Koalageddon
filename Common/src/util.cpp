@@ -122,16 +122,15 @@ HANDLE getProcessHandle(string name, DWORD dwAccess)
 	return INVALID_HANDLE_VALUE;
 }
 
-
-path getWorkingDirPath()
+path getPathFromRegistry(string value)
 {
 	try
 	{
-		return absolute(getReg(KOALAGEDDON_KEY, WORKING_DIR));
+		return absolute(getReg(KOALAGEDDON_KEY, value));
 	} catch(std::exception& e)
 	{
 		auto message = fmt::format(
-			"Failed to read Koalageddon working directory from the registry.\n"\
+			"Failed to read the value of '{}' from the registry.\n"\
 			"You have to run the Integration Wizard to fix this issue.\n" \
 			"Exception message: {}", e.what()
 		);
@@ -140,9 +139,28 @@ path getWorkingDirPath()
 	}
 }
 
+path getWorkingDirPath()
+{
+	// TODO: static?
+	return getPathFromRegistry(WORKING_DIR);
+}
+
 path getCacheDirPath()
 {
+	// TODO: static?
 	return getWorkingDirPath() / "cache";
+}
+
+path getInstallDirPath()
+{
+	// TODO: static?
+	return getPathFromRegistry(INSTALL_DIR);
+}
+
+path getConfigPath()
+{
+	// TODO: static?
+	return getWorkingDirPath() / CONFIG_NAME;
 }
 
 bool is32bit(DWORD PID)

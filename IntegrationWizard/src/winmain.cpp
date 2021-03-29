@@ -12,11 +12,29 @@ void fatalError(string message)
 	exit(1);
 }
 
+wstring getEnvVar(wstring key)
+{
+	TCHAR buffer[MAX_PATH];
+	GetEnvironmentVariable(key.c_str(), buffer, MAX_PATH);
+
+	return absolute(buffer);
+}
+
+path getAppDataPath()
+{
+	return absolute(getEnvVar(L"AppData"));
+}
+
+path getDesktopPath()
+{
+	return absolute(getEnvVar(L"UserProfile")) / "Desktop";
+}
+
+
 void firstSetup()
 {
-	setReg(KOALAGEDDON_KEY, WORKING_DIR, getCurrentProcessPath().parent_path().string());
-
-	auto configPath = getWorkingDirPath() / CONFIG_NAME;
+	setReg(KOALAGEDDON_KEY, INSTALL_DIR, getCurrentProcessPath().parent_path().string());
+	setReg(KOALAGEDDON_KEY, WORKING_DIR, (getAppDataPath() / ACIDICOALA / KOALAGEDDON).string());
 
 	// Load the default config into memory
 	HRSRC hResource = FindResource(nullptr, MAKEINTRESOURCE(IDR_DEFAULT_CONFIG), L"CONFIG");
@@ -36,9 +54,9 @@ void firstSetup()
 	auto dataSize = SizeofResource(nullptr, hResource);
 	auto dataPtr = LockResource(hMemory);
 
-	if(std::filesystem::exists(configPath))
+	if(std::filesystem::exists(getConfigPath()))
 	{ // If config exists, check if it needs updating
-		auto ifs = std::ifstream(getWorkingDirPath() / CONFIG_NAME, std::ios::in);
+		auto ifs = std::ifstream(getConfigPath(), std::ios::in);
 		if(!ifs.good())
 		{
 			fatalError("Failed to open input stream to read existing config file");
@@ -58,7 +76,8 @@ void firstSetup()
 	}
 
 	// Copy the default config
-	std::ofstream configFile(configPath, std::ios::out | std::ios::binary);
+	std::filesystem::create_directories(getConfigPath().parent_path());
+	std::ofstream configFile(getConfigPath(), std::ios::out | std::ios::binary);
 	if(!configFile.good())
 	{
 		fatalError("Failed to open output file stream when writing config file");
@@ -70,7 +89,6 @@ void firstSetup()
 
 
 }
-
 
 void askForAction(
 	HINSTANCE hInstance,
@@ -142,6 +160,38 @@ void askForAction(
 	}
 }
 
+bool createShortcut(string target, string linkFile)
+{
+	IShellLink* pShellLink = NULL;
+	auto result = CoInitializeEx(NULL, NULL);
+	if(result == S_OK)
+	{
+		HRESULT hRes = E_INVALIDARG;
+
+		hRes = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*) &pShellLink);
+		if(SUCCEEDED(hRes))
+		{
+			/* Set the fields in the IShellLink object */
+			hRes = pShellLink->SetPath(stow(target).c_str());
+			hRes = pShellLink->SetDescription(L"Desc");
+
+			/* Use the IPersistFile object to save the shell link */
+			IPersistFile* pPersistFile = NULL;
+			hRes = pShellLink->QueryInterface(IID_IPersistFile, (LPVOID*) &pPersistFile);
+			if(SUCCEEDED(hRes))
+			{
+				hRes = pPersistFile->Save(stow(linkFile).c_str(), TRUE);
+				pPersistFile->Release();
+				return true;
+			}
+			pShellLink->Release();
+		}
+	}
+
+	CoUninitialize();
+	return false;
+}
+
 int APIENTRY wWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -180,6 +230,7 @@ int APIENTRY wWinMain(
 		case Action::INSTALL_INTEGRATIONS:
 		case Action::REMOVE_INTEGRATIONS:
 			IntegrationWizard::alterPlatform(action, platformID, platforms);
+			createShortcut(getConfigPath().string(), getDesktopPath().string());
 			break;
 		case Action::NOTHING_TO_INSTALL:
 			MessageBox(NULL, L"Koalageddon did not find any installed platforms.", L"Nothing found", MB_ICONINFORMATION);

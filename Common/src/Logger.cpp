@@ -5,6 +5,11 @@
 namespace Logger
 {
 
+path getLogsDirPath()
+{
+	return getWorkingDirPath() / "logs";
+}
+
 void init(string loggerName, bool truncate)
 {
 	Config::init();
@@ -15,7 +20,8 @@ void init(string loggerName, bool truncate)
 	{
 		auto processName = getCurrentProcessPath().stem().string();
 		auto fileName = fmt::format("{}.{}.log", loggerName, processName);
-		auto path = getWorkingDirPath() / "logs" / fileName;
+		auto path = getLogsDirPath() / fileName;
+
 		logger = spdlog::basic_logger_mt(loggerName, path.u8string(), truncate);
 		logger->set_pattern("[%H:%M:%S.%e] [%l]\t%v");
 		logger->set_level(spdlog::level::from_str(config->log_level));
@@ -27,7 +33,6 @@ void init(string loggerName, bool truncate)
 		MessageBox(NULL, message.c_str(), L"Failed to initialize the log file", MB_ICONERROR | MB_OK);
 		exit(1);
 	}
-
 }
 
 }

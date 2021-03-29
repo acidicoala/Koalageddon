@@ -54,7 +54,7 @@ void installIntegration(const PlatformInstallation& platform)
 	);
 
 	auto integrationDLL = platform.architecture == Architecture::x32 ? INTEGRATION_32 : INTEGRATION_64;
-	auto integrationDllPath = getWorkingDirPath() / integrationDLL;
+	auto integrationDllPath = getInstallDirPath() / integrationDLL;
 	auto versionDLLPath = platform.path / "version.dll";
 	logger->debug(
 		"Integration DLL path: '{}', Destination: '{}'",

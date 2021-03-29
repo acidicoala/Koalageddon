@@ -30,9 +30,9 @@ void init(HMODULE hModule)
 				return;
 			}
 
-			auto unlockerPath = getWorkingDirPath() / UNLOCKER_DLL;
-			logger->debug("Unlocker path: {}", unlockerPath.string());
-
+			auto unlockerPath = getInstallDirPath() / UNLOCKER_DLL;
+			logger->debug("Unlocker path: '{}'", unlockerPath.string());
+			
 			hUnlocker = LoadLibrary(unlockerPath.wstring().c_str());
 			if(hUnlocker == NULL)
 			{

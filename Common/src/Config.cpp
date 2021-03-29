@@ -17,13 +17,11 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Platforms, Steam, EpicGames, Origin, UplayR1)
 
 Config::Config()
 {
-	auto fullPath = getWorkingDirPath() / CONFIG_NAME;
-
-	std::ifstream ifs(fullPath, std::ios::in);
+	std::ifstream ifs(getConfigPath(), std::ios::in);
 
 	if(!ifs.good())
 	{
-		MessageBox(NULL, fullPath.c_str(), L"Config not found at: ", MB_ICONERROR);
+		MessageBox(NULL, getConfigPath().c_str(), L"Config not found at: ", MB_ICONERROR);
 		exit(1);
 	}
 

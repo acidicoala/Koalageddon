@@ -30,9 +30,13 @@ constexpr auto steamclient_patterns_url = "https://raw.githubusercontent.com/aci
 constexpr auto latest_release_url_api = "https://api.github.com/repos/acidicoala/Koalageddon/releases/latest";
 constexpr auto latest_release_url = "https://github.com/acidicoala/Koalageddon/releases/latest";
 
-// Registry
+// Registry & paths
 constexpr auto KOALAGEDDON_KEY = R"(SOFTWARE\acidicoala\Koalageddon)";
 constexpr auto WORKING_DIR = "WORKING_DIR";
+constexpr auto INSTALL_DIR = "INSTALL_DIR";
+constexpr auto CONFIG_NAME = "Config.jsonc";
+constexpr auto ACIDICOALA = "acidicoala";
+constexpr auto KOALAGEDDON = "Koalageddon";
 
 // Platform info
 
