@@ -160,38 +160,6 @@ void askForAction(
 	}
 }
 
-bool createShortcut(string target, string linkFile)
-{
-	IShellLink* pShellLink = NULL;
-	auto result = CoInitializeEx(NULL, NULL);
-	if(result == S_OK)
-	{
-		HRESULT hRes = E_INVALIDARG;
-
-		hRes = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*) &pShellLink);
-		if(SUCCEEDED(hRes))
-		{
-			/* Set the fields in the IShellLink object */
-			hRes = pShellLink->SetPath(stow(target).c_str());
-			hRes = pShellLink->SetDescription(L"Desc");
-
-			/* Use the IPersistFile object to save the shell link */
-			IPersistFile* pPersistFile = NULL;
-			hRes = pShellLink->QueryInterface(IID_IPersistFile, (LPVOID*) &pPersistFile);
-			if(SUCCEEDED(hRes))
-			{
-				hRes = pPersistFile->Save(stow(linkFile).c_str(), TRUE);
-				pPersistFile->Release();
-				return true;
-			}
-			pShellLink->Release();
-		}
-	}
-
-	CoUninitialize();
-	return false;
-}
-
 int APIENTRY wWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -230,7 +198,6 @@ int APIENTRY wWinMain(
 		case Action::INSTALL_INTEGRATIONS:
 		case Action::REMOVE_INTEGRATIONS:
 			IntegrationWizard::alterPlatform(action, platformID, platforms);
-			createShortcut(getConfigPath().string(), getDesktopPath().string());
 			break;
 		case Action::NOTHING_TO_INSTALL:
 			MessageBox(NULL, L"Koalageddon did not find any installed platforms.", L"Nothing found", MB_ICONINFORMATION);
