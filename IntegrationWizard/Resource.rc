@@ -50,7 +50,7 @@ END
 // CONFIG
 //
 
-IDR_DEFAULT_CONFIG      CONFIG                  ".\\Config.jsonc"
+IDR_DEFAULT_CONFIG      CONFIG                  "..\\Config.jsonc"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ IDR_DEFAULT_CONFIG      CONFIG                  ".\\Config.jsonc"
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON1               ICON                    "D:\\Dev\\VisualStudioProjects\\Koalageddon\\icon.ico"
+IDI_ICON1               ICON                    "..\\icon.ico"
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////

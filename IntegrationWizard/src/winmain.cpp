@@ -31,6 +31,43 @@ path getDesktopPath()
 }
 
 
+
+HRESULT createShortcut(wstring targetLocation, wstring shortcutLocation, wstring description)
+{
+	HRESULT hres = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	if(SUCCEEDED(hres))
+	{
+		IShellLink* psl = NULL;
+
+		// Get a pointer to the IShellLink interface. It is assumed that CoInitialize
+		// has already been called.
+		hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*) &psl);
+		if(SUCCEEDED(hres))
+		{
+			IPersistFile* ppf = NULL;
+
+			// Set the path to the shortcut target and add the description. 
+			psl->SetPath(targetLocation.c_str());
+			psl->SetDescription(description.c_str());
+
+			// Query IShellLink for the IPersistFile interface, used for saving the 
+			// shortcut in persistent storage. 
+			hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*) &ppf);
+
+			if(SUCCEEDED(hres))
+			{
+				// Save the link by calling IPersistFile::Save. 
+				hres = ppf->Save(shortcutLocation.c_str(), TRUE);
+				ppf->Release();
+			}
+			psl->Release();
+		}
+		CoUninitialize();
+	}
+
+	return hres;
+}
+
 void firstSetup()
 {
 	setReg(KOALAGEDDON_KEY, INSTALL_DIR, getCurrentProcessPath().parent_path().string());
@@ -86,15 +123,14 @@ void firstSetup()
 
 	configFile.write((char*) dataPtr, dataSize);
 	configFile.close();
-
-
 }
 
 void askForAction(
 	HINSTANCE hInstance,
 	map<int, IntegrationWizard::PlatformInstallation>& platforms,
 	Action* action,
-	int* platformID
+	int* platformID,
+	BOOL* createShortcut
 )
 {
 	TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
@@ -135,6 +171,7 @@ void askForAction(
 	tdc.pRadioButtons = radioButtons.data();
 	tdc.pszContent = szBodyText;
 	tdc.pszExpandedInformation = szExpandedInformation;
+	tdc.pszVerificationText = L"Create desktop shortcut to configuration file";
 	tdc.pszFooter = szFooter;
 	tdc.pszFooterIcon = TD_INFORMATION_ICON;
 	tdc.pfCallback = [](HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LONG_PTR lpRefData)->HRESULT
@@ -147,7 +184,7 @@ void askForAction(
 		return S_OK;
 	};
 
-	if(SUCCEEDED(TaskDialogIndirect(&tdc, (int*) action, platformID, NULL)))
+	if(SUCCEEDED(TaskDialogIndirect(&tdc, (int*) action, platformID, createShortcut)))
 	{
 		logger->debug("Clicked button: {}", *action);
 
@@ -181,11 +218,12 @@ int APIENTRY wWinMain(
 
 	Action action;
 	int platformID;
+	BOOL shouldCreateShortcut = FALSE;
 
 	if(platforms.empty())
 		action = Action::NOTHING_TO_INSTALL;
 	else
-		askForAction(hInstance, platforms, &action, &platformID);
+		askForAction(hInstance, platforms, &action, &platformID, &shouldCreateShortcut);
 
 	switch(action)
 	{
@@ -196,8 +234,15 @@ int APIENTRY wWinMain(
 			logger->info("No action was taken. Terminating.");
 			break;
 		case Action::INSTALL_INTEGRATIONS:
+			[[fallthrough]];
 		case Action::REMOVE_INTEGRATIONS:
 			IntegrationWizard::alterPlatform(action, platformID, platforms);
+			if(shouldCreateShortcut)
+				createShortcut(
+					getConfigPath().wstring(),
+					(getDesktopPath() / "Config.lnk").wstring(),
+					L"Kolageddon Configuration File"
+				);
 			break;
 		case Action::NOTHING_TO_INSTALL:
 			MessageBox(NULL, L"Koalageddon did not find any installed platforms.", L"Nothing found", MB_ICONINFORMATION);
