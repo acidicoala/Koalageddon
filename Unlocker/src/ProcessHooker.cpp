@@ -154,7 +154,7 @@ void injectIfNecessary(wstring cmdLine, LPPROCESS_INFORMATION lpProcessInformati
 				// Steam->Uplay integration
 				if(contains(wtos(cmdLine), "uplay_steam_mode"))
 				{
-					if(!config->platformRefs.UplayR1.replicate)
+					if(config->platformRefs.UplayR1.enabled && !config->platformRefs.UplayR1.replicate)
 					{
 						logger->debug("Skipping injection since Uplay replication is disabled");
 						return;
