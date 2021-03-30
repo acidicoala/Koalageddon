@@ -140,24 +140,35 @@ void injectIfNecessary(wstring cmdLine, LPPROCESS_INFORMATION lpProcessInformati
 		{
 			for(const auto& ignoredProcess : platform.ignore)
 			{
-				if(stringsAreEqual(newProcName, ignoredProcess))
+				if(stringsAreEqual(newProcName, ignoredProcess, true))
 				{
 					// Do not inject since the process is ignored for this platforms
 					logger->debug("Skipping injection since the new process is ignored for this platform");
 					return;
 				}
 			}
-			// Special case of Steam->Uplay integration
-			if(contains(wtos(cmdLine), "uplay_steam_mode"))
+
+			// Special Steam checks
+			if(stringsAreEqual(config->platformRefs.Steam.process, platform.process, true))
 			{
-				if(!config->platformRefs.UplayR1.replicate)
+				// Steam->Uplay integration
+				if(contains(wtos(cmdLine), "uplay_steam_mode"))
 				{
-					logger->debug("Skipping injection since Uplay replication is disabled");
-					return;
+					if(!config->platformRefs.UplayR1.replicate)
+					{
+						logger->debug("Skipping injection since Uplay replication is disabled");
+						return;
+					}
+					else
+					{
+						break;
+					}
 				}
-				else
+
+				if(!config->platformRefs.Steam.unlock_dlc)
 				{
-					break;
+					logger->debug("Skipping injection since DLC unlocking in Steam is disabled");
+					return;
 				}
 			}
 

@@ -85,7 +85,7 @@ void SteamClient::installHooks()
 		HOOK(SharedLibraryLockStatus);
 		HOOK(SharedLibraryStopPlaying);
 	}
-	if(!config->platformRefs.Steam.replicate)
+	if(config->platformRefs.Steam.unlock_dlc && !config->platformRefs.Steam.replicate)
 	{
 		HOOK(IsAppDLCEnabled);
 		HOOK(IsSubscribedApp);

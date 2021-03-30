@@ -24,7 +24,7 @@ void UpdateChecker::checkForUpdates()
 		{
 			logger->warn(
 				"A new Koalageddon version {} has been released. Get it from: {} ",
-				currentVersionTag, latest_release_url
+				tagName, latest_release_url
 			);
 		}
 	}).detach();

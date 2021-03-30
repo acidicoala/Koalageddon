@@ -7,10 +7,13 @@
 
 void Steam::platformInit()
 {
-	HOOK(SteamInternal_FindOrCreateUserInterface);
-	HOOK(SteamInternal_CreateInterface);
-	HOOK(SteamApps);
-	HOOK(SteamClient);
+	if(config->platformRefs.Steam.unlock_dlc)
+	{
+		HOOK(SteamInternal_FindOrCreateUserInterface);
+		HOOK(SteamInternal_CreateInterface);
+		HOOK(SteamApps);
+		HOOK(SteamClient);
+	}
 }
 
 string Steam::getPlatformName()
