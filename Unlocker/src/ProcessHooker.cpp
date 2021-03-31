@@ -26,9 +26,9 @@ void inject(std::wstring wPID, uint64_t funcAddr)
 	// Determine the target executable's architecture to launch correponding injector
 	bool is32 = is32bit(PID);
 
-	auto workingDir = getWorkingDirPath();
-	auto injectorPath = workingDir / (is32 ? INJECTOR_32 : INJECTOR_64);
-	auto unlockerPath = workingDir / (is32 ? UNLOCKER_32 : UNLOCKER_64);
+	auto installDir = getInstallDirPath();
+	auto injectorPath = installDir / (is32 ? INJECTOR_32 : INJECTOR_64);
+	auto unlockerPath = installDir / (is32 ? UNLOCKER_32 : UNLOCKER_64);
 
 	// Validate paths
 	if(!std::filesystem::exists(injectorPath))

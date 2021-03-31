@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr auto VERSION = "1.3.0";
+constexpr auto VERSION = "1.3.1";
 
 constexpr auto INTEGRATION_64 = L"Integration64.dll";
 constexpr auto INTEGRATION_32 = L"Integration32.dll";
