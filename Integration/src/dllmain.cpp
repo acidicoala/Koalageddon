@@ -20,7 +20,7 @@ void init(HMODULE hModule)
 
 	for(const auto& [key, platform] : config->platforms)
 	{
-		if(stringsAreEqual(currentProcess, platform.process))
+		if(stringsAreEqual(currentProcess, platform.process, true))
 		{
 			logger->info("Target platform detected: {}", platform.process);
 
