@@ -9,7 +9,7 @@ void Origin::platformInit()
 {
 #ifndef _WIN64
 
-	fetchingEntitlementsAsync();
+	fetchEntitlementsAsync();
 
 	if(stringsAreEqual(getCurrentProcessName(), config->platformRefs.Origin.process))
 	{

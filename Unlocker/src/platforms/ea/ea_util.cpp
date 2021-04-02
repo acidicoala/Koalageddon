@@ -155,7 +155,7 @@ void readEntitlementsFromFile()
 		logger->info("Origin entitlements were successfully read from file");
 }
 
-void fetchingEntitlementsAsync()
+void fetchEntitlementsAsync()
 {
 	// Execute blocking operations in a new thread
 	std::thread fetchingThread([]{

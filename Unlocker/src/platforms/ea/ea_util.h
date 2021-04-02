@@ -6,4 +6,4 @@ using namespace tinyxml2;
 extern XMLDocument originEntitlementsXML;
 extern XMLDocument eaDesktopEntitlementsXML;
 
-void fetchingEntitlementsAsync();
+void fetchEntitlementsAsync();

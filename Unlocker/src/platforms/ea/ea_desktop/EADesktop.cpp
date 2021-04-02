@@ -9,7 +9,7 @@ void EADesktop::platformInit()
 {
 #ifdef _WIN64
 
-	fetchingEntitlementsAsync();
+	fetchEntitlementsAsync();
 
 	auto currentProcess = getCurrentProcessName();
 	auto& eaDesktopProcess = config->platformRefs.EADesktop.process;
