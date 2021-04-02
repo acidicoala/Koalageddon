@@ -1,11 +1,12 @@
 #pragma once
 
-constexpr auto VERSION = "1.3.2";
+constexpr auto VERSION = "1.4.0";
 
 constexpr auto INTEGRATION_64 = L"Integration64.dll";
 constexpr auto INTEGRATION_32 = L"Integration32.dll";
 
 #ifdef _WIN64
+constexpr auto INTEGRATION = INTEGRATION_64;
 
 constexpr auto EOSSDK = L"EOSSDK-Win64-Shipping.dll";
 constexpr auto STEAMAPI = L"steam_api64.dll";
@@ -14,6 +15,7 @@ constexpr auto UPLAY_R1 = L"uplay_r1_loader64.dll";
 constexpr auto UPLAY_R2 = L"uplay_r2_loader64.dll";
 
 #else
+constexpr auto INTEGRATION = INTEGRATION_32;
 
 constexpr auto EOSSDK = L"EOSSDK-Win32-Shipping.dll";
 constexpr auto STEAMAPI = L"steam_api.dll";
@@ -23,7 +25,9 @@ constexpr auto UPLAY_R2 = L"uplay_r2_loader.dll";
 
 #endif
 
-constexpr auto ORIGINCLIENT = L"OriginClient.dll";
+constexpr auto ORIGINCLIENT = L"OriginClient.dll"; // x86 only
+constexpr auto EA_DESKTOP = L"Qt5Core.dll"; // x86-64 only
+
 
 constexpr auto origin_entitlements_url = "https://raw.githubusercontent.com/acidicoala/public-entitlements/main/origin/v1/entitlements.json";
 constexpr auto steamclient_patterns_url = "https://raw.githubusercontent.com/acidicoala/public-entitlements/main/koalageddon/v1/steamclient-patterns.json";
@@ -64,7 +68,7 @@ constexpr auto ORIGIN_VALUE = "OriginPath";
 constexpr auto EA_DESKTOP_NAME = "EA Desktop";
 constexpr auto EA_DESKTOP_PROCESS = "EADesktop.exe";
 constexpr auto EA_DESKTOP_KEY = R"(SOFTWARE\Electronic Arts\EA Desktop)";
-constexpr auto EA_DESKTOP_VALUE = "InstallLocation";
+constexpr auto EA_DESKTOP_VALUE = "DesktopAppPath";
 
 constexpr auto EPIC_GAMES_NAME = "Epic Games";
 constexpr auto STEAM_CLIENT_NAME = "Steam Client";

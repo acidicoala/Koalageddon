@@ -131,8 +131,8 @@ void IntegrationWizard::alterPlatform(Action action, int platformID, map<int, Pl
 }
 
 map<string, PlatformRegistry> platformRegMap = {
-	// EA Desktop is not implemented. Yet...
-	// {EA_DESKTOP_NAME,	PlatformRegistry{ Architecture::x64, EA_DESKTOP_PROCESS,EA_DESKTOP_KEY,	EA_DESKTOP_VALUE}},
+	// TODO: Use config process instead of hardcoded
+	{EA_DESKTOP_NAME,	PlatformRegistry{ Architecture::x64, EA_DESKTOP_PROCESS,EA_DESKTOP_KEY,	EA_DESKTOP_VALUE}},
 	{EPIC_GAMES_32_NAME,PlatformRegistry{ Architecture::x32, EPIC_GAMES_PROCESS,EPIC_GAMES_KEY,	EPIC_GAMES_VALUE}},
 	{EPIC_GAMES_64_NAME,PlatformRegistry{ Architecture::x64, EPIC_GAMES_PROCESS,EPIC_GAMES_KEY,	EPIC_GAMES_VALUE}},
 	{ORIGIN_NAME,		PlatformRegistry{ Architecture::x32, ORIGIN_PROCESS,	ORIGIN_KEY,		ORIGIN_VALUE	}},
@@ -158,7 +158,7 @@ map<int, PlatformInstallation> IntegrationWizard::getInstalledPlatforms()
 				platformPath /= R"(Launcher\Portal\Binaries\Win32)";
 			else if(name == EPIC_GAMES_64_NAME)
 				platformPath /= R"(Launcher\Portal\Binaries\Win64)";
-			else if(name == ORIGIN_NAME) // Origin stores path to exe
+			else if(name == ORIGIN_NAME || name==EA_DESKTOP_NAME) // Origin & EA Desktop store path to exe
 				platformPath = platformPath.parent_path();
 
 			if(std::filesystem::exists(platformPath))

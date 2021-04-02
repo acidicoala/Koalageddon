@@ -12,7 +12,7 @@ path getLogsDirPath()
 
 void init(string loggerName, bool truncate)
 {
-	Config::init();
+	Config::init(); // TODO: Remove
 	if(config->log_level == "off")
 		return;
 
@@ -26,12 +26,20 @@ void init(string loggerName, bool truncate)
 		logger->set_pattern("[%H:%M:%S.%e] [%l]\t%v");
 		logger->set_level(spdlog::level::from_str(config->log_level));
 		logger->flush_on(spdlog::level::debug);
-	} catch(const spdlog::spdlog_ex& ex)
+	} catch(const std::exception&)
 	{
 		// Now if we can't open log file, something must be really wrong, hence we exit.
+		/*
 		auto message = stow(string(ex.what()));
 		MessageBox(NULL, message.c_str(), L"Failed to initialize the log file", MB_ICONERROR | MB_OK);
 		exit(1);
+		*/
+
+		// EDIT:
+
+		// Actually, it might be the case that multiple instances of the same process are launched
+		// simultaneously. In this case it is very likely that they will fail at opening the file.
+		// Example: QtWebEngineProcess.exe - issues ACCESS DENIED
 	}
 }
 

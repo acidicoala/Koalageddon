@@ -53,7 +53,7 @@ bool contains(wstring haystack, wstring needle);
 bool startsWith(string word, string prefix);
 bool endsWith(string word, string postfix);
 string toLower(string str);
-bool stringsAreEqual(string one, string two, bool insensitive = false);
+bool stringsAreEqual(string one, string two, bool insensitive = true);
 
 // Registry
 string getReg(string key, string valueName);

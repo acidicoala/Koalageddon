@@ -7,20 +7,50 @@ using std::filesystem::path;
 
 path thisDllPath;
 HMODULE hUnlocker = NULL;
+HMODULE hOriginal = NULL;
+
+bool initialized = false;
 
 void init(HMODULE hModule)
 {
-	Logger::init("Integration", true);
+	static std::mutex m;
+	const std::lock_guard<std::mutex> lock(m);
+	if(initialized)
+	{
+		logger->warn("Already initialized");
+	}
+	Config::init();
+	Logger::init(wtos(INTEGRATION), true);
 	logger->info("Integration v{}", VERSION);
 
 	DisableThreadLibraryCalls(hModule);
 
+	TCHAR buffer[MAX_PATH];
+	auto result = GetModuleFileNameEx(GetCurrentProcess(), hModule, buffer, MAX_PATH);
+	if(result == NULL)
+	{
+		logger->error("Failed to get path of current module. Error code: {}", GetLastError());
+	}
+	auto originalPath = absolute(buffer).parent_path() / "version_o.dll";
+	hOriginal = LoadLibrary(originalPath.c_str());
+	if(hOriginal == NULL)
+	{
+		logger->error(
+			"Failed to load original library at: '{}'. Error code: {}",
+			originalPath.string(), GetLastError()
+		);
+	}
+	else
+	{
+		logger->info("Successfully loaded original DLL at: '{}'", originalPath.string());
+	}
+
 	auto currentProcess = getCurrentProcessName();
-	logger->debug("Current process: {}", currentProcess);
+	logger->info("Current process: {}", currentProcess);
 
 	for(const auto& [key, platform] : config->platforms)
 	{
-		if(stringsAreEqual(currentProcess, platform.process, true))
+		if(stringsAreEqual(currentProcess, platform.process))
 		{
 			logger->info("Target platform detected: {}", platform.process);
 
@@ -31,8 +61,8 @@ void init(HMODULE hModule)
 			}
 
 			auto unlockerPath = getInstallDirPath() / UNLOCKER_DLL;
-			logger->debug("Unlocker path: '{}'", unlockerPath.string());
-			
+			logger->info("Unlocker path: '{}'", unlockerPath.string());
+
 			hUnlocker = LoadLibrary(unlockerPath.wstring().c_str());
 			if(hUnlocker == NULL)
 			{
@@ -44,13 +74,19 @@ void init(HMODULE hModule)
 			}
 		}
 	}
+	logger->info("Initialization complete");
+	initialized = true;
 }
 
 void shutdown()
 {
 	if(hUnlocker != NULL)
+	{
 		FreeLibrary(hUnlocker);
-
+		hUnlocker = NULL;
+		logger->info("Shutdown");
+	}
+	initialized = false;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)

@@ -1,6 +1,6 @@
 {
-	"config_version": 4, // DO NOT EDIT THIS VALUE
-	"log_level": "info",
+	"config_version": 5, // DO NOT EDIT THIS VALUE
+	"log_level": "debug",
 	"platforms": {
 		"Steam": {
 			"enabled": true,
@@ -47,6 +47,15 @@
 			],
 			"ignore": []
 		},
+		"EADesktop": {
+			"enabled": true,
+			"process": "EADesktop.exe",
+			"replicate": false,
+			"blacklist": [ // Use productId from Unlocker64.EADesktop.log
+
+			],
+			"ignore": []
+		},
 		"UplayR1": {
 			"enabled": true,
 			"process": "upc.exe",
@@ -73,6 +82,8 @@
 		// Origin
 		"OriginER.exe",
 		"OriginCrashReporter.exe",
+		// EA Desktop
+		"EACrashReporter.exe",
 		// Ubisoft
 		"UplayCrashReporter.exe"
 	]

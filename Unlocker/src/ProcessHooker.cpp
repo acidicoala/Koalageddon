@@ -133,14 +133,37 @@ void injectIfNecessary(wstring cmdLine, LPPROCESS_INFORMATION lpProcessInformati
 
 	auto newProcName = wtos(match.str());
 
+	// Iterate over terminate processes
+	for(const auto& terminatedProcess : config->terminate)
+	{
+		if(terminatedProcess == newProcName)
+		{
+			// Kill the process if it is in the terminate list
+			logger->warn("Terminating the process: {}", terminatedProcess);
+			killProcess(lpProcessInformation->hProcess);
+			return;
+		}
+	}
+
+	// Iterate over ignored processes
+	for(const auto& ignoredProcess : config->ignore)
+	{
+		if(ignoredProcess == newProcName)
+		{
+			// Don't inject the DLL, just let it run as usual
+			logger->debug("Skipping injection for the globally ignored process: {}", ignoredProcess);
+			return;
+		}
+	}
+
 	// Iterate over platforms
 	for(const auto& [key, platform] : config->platforms)
 	{
-		if(stringsAreEqual(getCurrentProcessName(), platform.process, true))
+		if(stringsAreEqual(getCurrentProcessName(), platform.process))
 		{
 			for(const auto& ignoredProcess : platform.ignore)
 			{
-				if(stringsAreEqual(newProcName, ignoredProcess, true))
+				if(stringsAreEqual(newProcName, ignoredProcess))
 				{
 					// Do not inject since the process is ignored for this platforms
 					logger->debug("Skipping injection since the new process is ignored for this platform");
@@ -149,7 +172,7 @@ void injectIfNecessary(wstring cmdLine, LPPROCESS_INFORMATION lpProcessInformati
 			}
 
 			// Special Steam checks
-			if(stringsAreEqual(config->platformRefs.Steam.process, platform.process, true))
+			if(stringsAreEqual(config->platformRefs.Steam.process, platform.process))
 			{
 				// Steam->Uplay integration
 				if(contains(wtos(cmdLine), "uplay_steam_mode"))
@@ -179,29 +202,6 @@ void injectIfNecessary(wstring cmdLine, LPPROCESS_INFORMATION lpProcessInformati
 				logger->debug("Skipping injection since {} replication is disabled", key);
 				return;
 			}
-		}
-	}
-
-	// Iterate over ignored processes
-	for(const auto& ignoredProcess : config->ignore)
-	{
-		if(ignoredProcess == newProcName)
-		{
-			// Don't inject the DLL, just let it run as usual
-			logger->debug("Skipping injection for the globally ignored process: {}", ignoredProcess);
-			return;
-		}
-	}
-
-	// Iterate over terminate processes
-	for(const auto& terminatedProcess : config->terminate)
-	{
-		if(terminatedProcess == newProcName)
-		{
-			// Kill the process if it is in the terminate list
-			logger->warn("Terminating the process: {}", terminatedProcess);
-			killProcess(lpProcessInformation->hProcess);
-			return;
 		}
 	}
 

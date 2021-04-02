@@ -45,6 +45,12 @@
     <Filter Include="Source Files\platforms\uplay_r1">
       <UniqueIdentifier>{e1f0bb2b-4cf4-4a3b-8c4c-d5e216cd5eba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\platforms\steam_client">
+      <UniqueIdentifier>{9e69e971-135d-48fd-a877-42da42dd2cff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\platforms\steam_client">
+      <UniqueIdentifier>{ebc40d9a-24d1-4a57-8325-ba65c72c8398}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DLLMonitor.h">
@@ -98,13 +104,10 @@
     <ClInclude Include="src\platforms\steam\Steam.h">
       <Filter>Header Files\platforms\steam</Filter>
     </ClInclude>
-    <ClInclude Include="src\platforms\steam\steam_ordinals.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platforms\origin\origin_hooks.h">
+    <ClInclude Include="src\platforms\ea\origin\origin_hooks.h">
       <Filter>Header Files\platforms\origin</Filter>
     </ClInclude>
-    <ClInclude Include="src\platforms\origin\Origin.h">
+    <ClInclude Include="src\platforms\ea\origin\Origin.h">
       <Filter>Header Files\platforms\origin</Filter>
     </ClInclude>
     <ClInclude Include="src\platforms\uplay_r2\UplayR2.h">
@@ -119,16 +122,28 @@
     <ClInclude Include="src\platforms\uplay_r1\uplay_r1_hooks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\platforms\steam_client\SteamClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platforms\steam_client\steam_client_hooks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\PatternMatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\UpdateChecker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platforms\steam\steam_ordinals.h">
+      <Filter>Header Files\platforms\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platforms\steam_client\steam_client_hooks.h">
+      <Filter>Header Files\platforms\steam_client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platforms\steam_client\SteamClient.h">
+      <Filter>Header Files\platforms\steam_client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platforms\ea\ea_desktop\EADesktop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platforms\ea\ea_desktop\ea_desktop_hooks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\platforms\ea\ea_util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -166,10 +181,10 @@
     <ClCompile Include="src\platforms\steam\steam_hooks.cpp">
       <Filter>Source Files\platforms\steam</Filter>
     </ClCompile>
-    <ClCompile Include="src\platforms\origin\Origin.cpp">
+    <ClCompile Include="src\platforms\ea\origin\Origin.cpp">
       <Filter>Source Files\platforms\origin</Filter>
     </ClCompile>
-    <ClCompile Include="src\platforms\origin\origin_hooks.cpp">
+    <ClCompile Include="src\platforms\ea\origin\origin_hooks.cpp">
       <Filter>Source Files\platforms\origin</Filter>
     </ClCompile>
     <ClCompile Include="src\platforms\uplay_r2\uplay_r2_hooks.cpp">
@@ -181,19 +196,28 @@
     <ClCompile Include="src\platforms\uplay_r1\UplayR1.cpp">
       <Filter>Source Files\platforms\uplay_r1</Filter>
     </ClCompile>
-    <ClCompile Include="src\platforms\uplay_r1\uplay_r1_hooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\platforms\steam_client\SteamClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\platforms\steam_client\steam_client_hooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\PatternMatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\UpdateChecker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platforms\uplay_r1\uplay_r1_hooks.cpp">
+      <Filter>Source Files\platforms\uplay_r1</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platforms\steam_client\SteamClient.cpp">
+      <Filter>Source Files\platforms\steam_client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platforms\steam_client\steam_client_hooks.cpp">
+      <Filter>Source Files\platforms\steam_client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platforms\ea\ea_desktop\EADesktop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platforms\ea\ea_desktop\ea_desktop_hooks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platforms\ea\ea_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

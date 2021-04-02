@@ -1,20 +1,22 @@
 #include "pch.h"
 #include "origin_hooks.h"
-#include "platforms/origin/Origin.h"
+#include "Origin.h"
 
-XMLDocument entitlementsXML; // TODO: Move to Origin.h?
+#define GET_ORIGINAL_FUNC(FUNC) PLH::FnCast(BasePlatform::trampolineMap[mangled_##FUNC], FUNC);
 
 auto& getOriginConfig()
 {
 	return config->platformRefs.Origin;
 }
 
-bool isEntitlementBlacklisted(XMLElement* pEntitlement)
+bool isOriginEntitlementBlacklisted(XMLElement* pEntitlement)
 {
-	return vectorContains(config->platforms["Origin"].blacklist, string(pEntitlement->FindAttribute("ItemId")->Value()));
-
+	return vectorContains(getOriginConfig().blacklist, string(pEntitlement->FindAttribute("ItemId")->Value()));
 }
-string* __fastcall encrypt(PARAMS(void* aes, string* message))
+
+#ifndef _WIN64
+
+string* __fastcall encrypt(PARAMS(void* mystery, string* message))
 {
 	do
 	{
@@ -42,17 +44,17 @@ string* __fastcall encrypt(PARAMS(void* aes, string* message))
 		auto pEntitlement = pQueryEntitlementsResponse->FirstChildElement("Entitlement");
 		while(pEntitlement != nullptr)
 		{
-			if(isEntitlementBlacklisted(pEntitlement))
+			if(isOriginEntitlementBlacklisted(pEntitlement))
 				pQueryEntitlementsResponse->DeleteChild(pEntitlement);
 			pEntitlement = pEntitlement->NextSiblingElement("Entitlement");
 		}
 
 		// Insert our entitlements into the original response
-		pEntitlement = entitlementsXML.FirstChildElement("Entitlements")->FirstChildElement("Entitlement");
+		pEntitlement = originEntitlementsXML.FirstChildElement("Entitlements")->FirstChildElement("Entitlement");
 		while(pEntitlement != nullptr)
 		{
 			// Have to make a copy because TinyXML2 doesn't allow insertion of elements from another doc...
-			if(!isEntitlementBlacklisted(pEntitlement))
+			if(!isOriginEntitlementBlacklisted(pEntitlement))
 				pQueryEntitlementsResponse->InsertEndChild(pEntitlement->DeepClone(&xmlDoc));
 			pEntitlement = pEntitlement->NextSiblingElement("Entitlement");
 		}
@@ -64,10 +66,9 @@ string* __fastcall encrypt(PARAMS(void* aes, string* message))
 		logger->info("Modified response: \n{}", printer.CStr());
 	} while(false);
 
-	auto result = PLH::FnCast(
-		BasePlatform::trampolineMap[mangled_encrypt],
-		encrypt
-	)(ARGS(aes, message));
+	static auto original = GET_ORIGINAL_FUNC(encrypt);
 
-	return result;
+	return original(ARGS(mystery, message));
 }
+
+#endif

@@ -205,7 +205,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\PatternMatcher.h" />
-    <ClInclude Include="src\platforms\origin\Origin.h" />
+    <ClInclude Include="src\platforms\ea\ea_desktop\EADesktop.h" />
+    <ClInclude Include="src\platforms\ea\ea_desktop\ea_desktop_hooks.h" />
+    <ClInclude Include="src\platforms\ea\origin\Origin.h" />
     <ClInclude Include="src\hook_util.h" />
     <ClInclude Include="src\DLLMonitor.h" />
     <ClInclude Include="src\platforms\BasePlatform.h" />
@@ -216,7 +218,8 @@
     <ClInclude Include="src\platforms\epic\eos_common.h" />
     <ClInclude Include="src\platforms\epic\eos_ecom_types.h" />
     <ClInclude Include="src\platforms\epic\eos_result.h" />
-    <ClInclude Include="src\platforms\origin\origin_hooks.h" />
+    <ClInclude Include="src\platforms\ea\origin\origin_hooks.h" />
+    <ClInclude Include="src\platforms\ea\ea_util.h" />
     <ClInclude Include="src\platforms\steam\steamtypes.h" />
     <ClInclude Include="src\platforms\steam\steam_hooks.h" />
     <ClInclude Include="src\platforms\steam\steam_ordinals.h" />
@@ -235,14 +238,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\PatternMatcher.cpp" />
-    <ClCompile Include="src\platforms\origin\Origin.cpp" />
+    <ClCompile Include="src\platforms\ea\ea_desktop\EADesktop.cpp" />
+    <ClCompile Include="src\platforms\ea\ea_desktop\ea_desktop_hooks.cpp" />
+    <ClCompile Include="src\platforms\ea\ea_util.cpp" />
+    <ClCompile Include="src\platforms\ea\origin\Origin.cpp" />
     <ClCompile Include="src\hook_util.cpp" />
     <ClCompile Include="src\DLLMonitor.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\platforms\BasePlatform.cpp" />
     <ClCompile Include="src\platforms\epic\eos_hooks.cpp" />
     <ClCompile Include="src\platforms\epic\Epic.cpp" />
-    <ClCompile Include="src\platforms\origin\origin_hooks.cpp" />
+    <ClCompile Include="src\platforms\ea\origin\origin_hooks.cpp" />
     <ClCompile Include="src\platforms\steam\steam_hooks.cpp" />
     <ClCompile Include="src\platforms\steam_client\SteamClient.cpp" />
     <ClCompile Include="src\platforms\steam_client\steam_client_hooks.cpp" />

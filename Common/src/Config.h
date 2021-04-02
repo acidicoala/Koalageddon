@@ -22,6 +22,7 @@ struct Platforms
 	SteamPlatform Steam;
 	Platform EpicGames;
 	Platform Origin;
+	Platform EADesktop;
 	Platform UplayR1;
 };
 

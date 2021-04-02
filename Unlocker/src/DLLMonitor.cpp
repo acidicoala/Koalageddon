@@ -5,7 +5,8 @@
 #include "platforms/epic/Epic.h"
 #include "platforms/steam/Steam.h"
 #include <platforms/steam_client/SteamClient.h>
-#include <platforms/origin/Origin.h>
+#include <platforms/ea/origin/Origin.h>
+#include <platforms/ea/ea_desktop/EADesktop.h>
 #include <platforms/uplay_r1/UplayR1.h>
 #include <platforms/uplay_r2/UplayR2.h>
 
@@ -81,6 +82,12 @@ void CALLBACK dllCallback(ULONG NotificationReason, PLDR_DLL_NOTIFICATION_DATA N
 			platforms.push_back(make_unique<UplayR2>(NotificationData->Loaded.FullDllName->Buffer));
 			platforms.back()->init();
 		}*/
+		else if(dllName == EA_DESKTOP)
+		{
+			logger->info(L"EA Desktop DLL has been detected");
+			platforms.push_back(make_unique<EADesktop>(NotificationData->Loaded.FullDllName->Buffer));
+			platforms.back()->init();
+		}
 	}
 }
 
@@ -127,6 +134,12 @@ void checkLoadedDlls()
 		platforms.push_back(make_unique<UplayR2>(handle));
 		platforms.back()->init();
 	}*/
+	else if(handle = GetModuleHandle(EA_DESKTOP))
+	{
+		logger->info(L"EA Desktop DLL is already loaded");
+		platforms.push_back(make_unique<EADesktop>(handle));
+		platforms.back()->init();
+	}
 	else
 	{
 		return;

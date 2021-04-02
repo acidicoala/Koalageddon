@@ -1,5 +1,4 @@
 #pragma once
-
 #include "platforms/BasePlatform.h"
 
 class Origin : public BasePlatform

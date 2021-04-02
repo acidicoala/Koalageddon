@@ -14,7 +14,7 @@ void from_json(const json& j, SteamPlatform& p)
 	j["unlock_dlc"].get_to(p.unlock_dlc);
 }
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Platforms, Steam, EpicGames, Origin, UplayR1)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Platforms, Steam, EpicGames, Origin, EADesktop, UplayR1)
 
 Config::Config()
 {
