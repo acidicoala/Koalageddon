@@ -50,9 +50,11 @@ string* __fastcall encrypt(PARAMS(void* mystery, string* message))
 		}
 
 		// Insert our entitlements into the original response
+		auto inserted = 0;
 		pEntitlement = originEntitlementsXML.FirstChildElement("Entitlements")->FirstChildElement("Entitlement");
 		while(pEntitlement != nullptr)
 		{
+			inserted++;
 			// Have to make a copy because TinyXML2 doesn't allow insertion of elements from another doc...
 			if(!isOriginEntitlementBlacklisted(pEntitlement))
 				pQueryEntitlementsResponse->InsertEndChild(pEntitlement->DeepClone(&xmlDoc));
@@ -64,6 +66,7 @@ string* __fastcall encrypt(PARAMS(void* mystery, string* message))
 		*message = printer.CStr(); // copy constructor
 
 		logger->info("Modified response: \n{}", printer.CStr());
+		logger->info("Inserted {} entitlements: {}", inserted);
 	} while(false);
 
 	static auto original = GET_ORIGINAL_FUNC(encrypt);

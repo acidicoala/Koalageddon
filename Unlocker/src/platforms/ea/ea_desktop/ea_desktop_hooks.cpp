@@ -6,10 +6,19 @@
 
 bool isEADesktopEntitlementBlacklisted(XMLElement* pEntitlement)
 {
-	return vectorContains(
-		config->platformRefs.EADesktop.blacklist,
-		string(pEntitlement->FirstChildElement("productId")->GetText())
-	);
+	// logger->warn("pEntitlement: {}", (void*) pEntitlement);
+	auto productId = pEntitlement->FirstChildElement("productId");
+	if(productId == nullptr)
+	{
+		// It actually happens. How come?
+		logger->warn("productId was null. pEntitlement: {}", (void*) pEntitlement);
+		return false;
+	}
+	else
+	{
+		return vectorContains(config->platformRefs.EADesktop.blacklist,string(productId->GetText()));
+	}
+
 }
 
 #ifdef _WIN64
@@ -51,7 +60,7 @@ string* toStdString(PARAMS(void* mystery))
 		{
 			if(isEADesktopEntitlementBlacklisted(pEntitlement))
 				pEntitlements->DeleteChild(pEntitlement);
-			pEntitlement = pEntitlement->NextSiblingElement("Entitlement");
+			pEntitlement = pEntitlement->NextSiblingElement("entitlement");
 		}
 
 		// Insert our entitlements into the original response
