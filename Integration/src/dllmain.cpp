@@ -20,7 +20,9 @@ void init(HMODULE hModule)
 		logger->warn("Already initialized");
 	}
 	Config::init();
-	Logger::init(wtos(INTEGRATION), true);
+	auto integrationDllStr = wtos(INTEGRATION);
+	auto integrationStr = integrationDllStr.substr(0, integrationDllStr.size() - 4);
+	Logger::init(integrationStr, true);
 	logger->info("Integration v{}", VERSION);
 
 	DisableThreadLibraryCalls(hModule);
