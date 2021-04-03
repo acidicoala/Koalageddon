@@ -145,7 +145,8 @@ void checkLoadedDlls()
 		return;
 	}
 
-	CloseHandle(handle);
+	// Don't need to dispose it, actually
+	// CloseHandle(handle);
 }
 
 PVOID cookie = NULL;
