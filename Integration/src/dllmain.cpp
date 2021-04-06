@@ -7,9 +7,15 @@ using std::filesystem::path;
 
 path thisDllPath;
 HMODULE hUnlocker = NULL;
-HMODULE hOriginal = NULL;
 
 bool initialized = false;
+
+path getVersionModulePath()
+{
+	TCHAR path[MAX_PATH];
+	GetSystemDirectory(path, MAX_PATH);
+	return absolute(path) / "Version.dll";
+}
 
 void init(HMODULE hModule)
 {
@@ -33,7 +39,7 @@ void init(HMODULE hModule)
 	{
 		logger->error("Failed to get path of current module. Error code: {}", GetLastError());
 	}
-	auto originalPath = absolute(buffer).parent_path() / "version_o.dll";
+	auto originalPath = getVersionModulePath();
 	hOriginal = LoadLibrary(originalPath.c_str());
 	if(hOriginal == NULL)
 	{

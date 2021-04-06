@@ -46,13 +46,6 @@ void showPostActionReport(Action action)
 
 void installIntegration(const PlatformInstallation& platform)
 {
-	auto originalDllPath = getVersionDllPath(platform.architecture);
-	auto originalVersionDllPath = platform.path / "version_o.dll";
-	logger->debug(
-		"Original DLL path: '{}', Destination: '{}'",
-		originalDllPath.string(), originalVersionDllPath.string()
-	);
-
 	auto integrationDLL = platform.architecture == Architecture::x32 ? INTEGRATION_32 : INTEGRATION_64;
 	auto integrationDllPath = getInstallDirPath() / integrationDLL;
 	auto versionDLLPath = platform.path / "version.dll";
@@ -64,24 +57,18 @@ void installIntegration(const PlatformInstallation& platform)
 	// Terminate the process to release a possible lock on the files
 	killProcess(platform.process);
 
-	copy_file(originalDllPath, originalVersionDllPath, copy_options::overwrite_existing);
 	copy_file(integrationDllPath, versionDLLPath, copy_options::overwrite_existing);
 }
 
 void removeIntegration(const PlatformInstallation& platform)
 {
 	auto versionDLLPath = platform.path / "version.dll";
-	auto originalDllPath = platform.path / "version_o.dll";
-	logger->debug(
-		"Version DLL path: '{}', Original DLL path: '{}'",
-		versionDLLPath.string(), originalDllPath.string()
-	);
+	logger->debug("Version DLL path: '{}'",versionDLLPath.string());
 
 	// Terminate the process to release potential locks on files
 	killProcess(platform.process);
 
 	DeleteFile(versionDLLPath.c_str());
-	DeleteFile(originalDllPath.c_str());
 }
 
 

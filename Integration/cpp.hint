@@ -1,0 +1,6 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define EXPORT_SPEC(TYPE) __declspec(dllexport) TYPE __stdcall
+#define FUNC_DECL(TYPE, NAME, __VA_ARGS__) __declspec(dllexport) TYPE __stdcall NAME(__VA_ARGS__)
+#define FUNC_IMPL(NAME, __VA_ARGS__) { static auto func = PLH::FnCast(GetProcAddress(hOriginal, #NAME), NAME); return func(__VA_ARGS__); }

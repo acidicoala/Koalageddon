@@ -1,5 +1,8 @@
 #pragma once
 
+extern HMODULE hOriginal;
+
+/*
 #pragma comment(linker, "/export:GetFileVersionInfoA=version_o.GetFileVersionInfoA")
 #pragma comment(linker, "/export:GetFileVersionInfoByHandle=version_o.GetFileVersionInfoByHandle")
 #pragma comment(linker, "/export:GetFileVersionInfoExA=version_o.GetFileVersionInfoExA")
@@ -17,3 +20,4 @@
 #pragma comment(linker, "/export:VerLanguageNameW=version_o.VerLanguageNameW")
 #pragma comment(linker, "/export:VerQueryValueA=version_o.VerQueryValueA")
 #pragma comment(linker, "/export:VerQueryValueW=version_o.VerQueryValueW")
+*/

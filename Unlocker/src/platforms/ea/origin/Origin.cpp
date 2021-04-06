@@ -7,16 +7,13 @@
 
 void Origin::platformInit()
 {
-#ifndef _WIN64
-
 	fetchEntitlementsAsync();
 
 	if(stringsAreEqual(getCurrentProcessName(), config->platformRefs.Origin.process))
 	{
-		HOOK(encrypt);
+		HOOK(encrypt$SimpleEncryption);
+		HOOK(decrypt$SimpleEncryption);
 	}
-
-#endif
 }
 
 string Origin::getPlatformName()

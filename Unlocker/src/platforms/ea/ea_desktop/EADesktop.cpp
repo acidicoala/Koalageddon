@@ -7,19 +7,16 @@
 
 void EADesktop::platformInit()
 {
-#ifdef _WIN64
-
 	fetchEntitlementsAsync();
 
+	// Filter by process, because Qt5 is likely to be used by a process other than EA Desktop
 	auto currentProcess = getCurrentProcessName();
 	auto& eaDesktopProcess = config->platformRefs.EADesktop.process;
 	logger->debug("Current process: {}, EA Desktop process: {}", currentProcess, eaDesktopProcess);
 	if(stringsAreEqual(currentProcess, eaDesktopProcess))
 	{
-		HOOK(toStdString);
+		HOOK(QVector$data);
 	}
-
-#endif
 }
 
 string EADesktop::getPlatformName()

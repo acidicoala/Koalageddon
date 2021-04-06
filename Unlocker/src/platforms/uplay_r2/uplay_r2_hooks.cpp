@@ -2,7 +2,7 @@
 #include "uplay_r2_hooks.h"
 #include "platforms/uplay_r2/UplayR2.h"
 
-#define GET_PROXY_FUNC(FUNC) \
+#define GET_ORIGINAL_FUNC(FUNC) \
 	static auto proxyFunc = PLH::FnCast(BasePlatform::trampolineMap[#FUNC], FUNC);
 
 using namespace UPC;
@@ -42,7 +42,7 @@ int UPC_Init(unsigned int version, unsigned int appID)
 		products.push_back(Product(item, ProductType::Item));
 	}
 
-	GET_PROXY_FUNC(UPC_Init);
+	GET_ORIGINAL_FUNC(UPC_Init);
 
 	return proxyFunc(version, appID);
 }
@@ -97,7 +97,7 @@ void ProductListGetCallback(unsigned long arg1, void* data)
 	}
 
 	// Free the legit product list
-	GET_PROXY_FUNC(UPC_ProductListFree);
+	GET_ORIGINAL_FUNC(UPC_ProductListFree);
 	proxyFunc(callbackContainer->context, callbackContainer->legitProductList);
 
 	callbackContainer->originalCallback(arg1, callbackContainer->callbackData);
@@ -133,7 +133,7 @@ int UPC_ProductListGet(
 		callbackData
 	};
 
-	GET_PROXY_FUNC(UPC_ProductListGet);
+	GET_ORIGINAL_FUNC(UPC_ProductListGet);
 	return proxyFunc(context, inOptUserIdUtf8, filter, &callbackContainer->legitProductList, ProductListGetCallback, callbackContainer);
 }
 

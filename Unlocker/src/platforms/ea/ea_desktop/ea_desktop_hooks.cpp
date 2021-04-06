@@ -1,90 +1,69 @@
 #include "pch.h"
 #include "ea_desktop_hooks.h"
 #include "EADesktop.h"
+#include "constants.h"
 
-#define GET_PROXY_FUNC(FUNC) PLH::FnCast(BasePlatform::trampolineMap[mangled_##FUNC], FUNC);
+#define GET_ORIGINAL_FUNC(FUNC) PLH::FnCast(BasePlatform::trampolineMap[mangled_##FUNC], FUNC);
 
-bool isEADesktopEntitlementBlacklisted(XMLElement* pEntitlement)
+/* An efficient algorithm to compare first N bytes of data with the needle string */
+bool contains(const char* data, const std::string& needle, const int N = 8)
 {
-	// logger->warn("pEntitlement: {}", (void*) pEntitlement);
-	auto productId = pEntitlement->FirstChildElement("productId");
-	if(productId == nullptr)
+	const auto needleSize = needle.size();
+	for(int i = 0; i < N; i++)
 	{
-		// It actually happens. How come?
-		logger->warn("productId was null. pEntitlement: {}", (void*) pEntitlement);
-		return false;
+		if(data[i] == '\0')
+			return false; // Reached end of data
+
+		size_t j;
+		for(j = 0; j < needleSize; j++)
+			if(data[i + j] != needle[j])
+				break; // Mismatched needle char
+
+		if(j == needleSize)
+			return true; // Matched all needle chars
+	}
+	return false; // Reached N
+}
+
+template <typename T>
+void scheduleForDeletion(T* data, int ms = 1000)
+{
+	std::thread([&](){
+		Sleep(ms);
+		delete data;
+	}).detach();
+}
+
+HOOK_SPEC(const char*) QVector$data(PARAMS(void* mystery))
+{
+	static auto proxy = GET_ORIGINAL_FUNC(QVector$data);
+	auto data = proxy(ARGS(mystery));
+
+	static string langRequestId;
+	static string needle("LSX");
+	if(!contains(data, needle))
+		return data; // Skip non LSX data
+
+	string str(data);
+
+	logger->debug("LSX intercepted:\n{}", str);
+
+	if(saveLangRequestId(str, &langRequestId))
+	{
+		return data;
 	}
 	else
 	{
-		return vectorContains(config->platformRefs.EADesktop.blacklist,string(productId->GetText()));
-	}
-
-}
-
-#ifdef _WIN64
-
-string* toStdString(PARAMS(void* mystery))
-{
-	static auto proxy = GET_PROXY_FUNC(toStdString);
-	auto str = proxy(ARGS(mystery));
-	if(str == nullptr)
-	{
-		logger->warn("toStdString -> null str");
-		return str;
-	}
-
-	logger->debug("toStdString -> {}", *str);
-
-	if(!startsWith(*str, R"(<?xml version="1.0" encoding="UTF-8" standalone="yes"?><entitlements>)"))
-	{ // irrelevant
-		return str;
-	}
-
-	do
-	{
-		XMLDocument xmlDoc;
-		if(xmlDoc.Parse(str->c_str()) != XMLError::XML_SUCCESS)
-			break;
-
-		auto pEntitlements = xmlDoc.FirstChildElement("entitlements");
-		if(pEntitlements == nullptr)
-			break;
-
-		logger->info("Intercepted entitlements xml");
-
-		// EA Desktop magic happens here
-
-		// First filter out blacklisted DLCs from the legit response
-		auto pEntitlement = pEntitlements->FirstChildElement("entitlement");
-		while(pEntitlement != nullptr)
+		auto newStr = new string;
+		if(modifyLangResponse(str, langRequestId, newStr) || modifyEntitlementReponse(str, newStr))
 		{
-			if(isEADesktopEntitlementBlacklisted(pEntitlement))
-				pEntitlements->DeleteChild(pEntitlement);
-			pEntitlement = pEntitlement->NextSiblingElement("entitlement");
+			scheduleForDeletion(newStr); // Free the heap after 1s
+			return newStr->c_str();
 		}
-
-		// Insert our entitlements into the original response
-		auto inserted = 0;
-		pEntitlement = eaDesktopEntitlementsXML.FirstChildElement("entitlements")->FirstChildElement("entitlement");
-		while(pEntitlement != nullptr)
+		else
 		{
-			inserted++;
-			// Have to make a copy because TinyXML2 doesn't allow insertion of elements from another doc...
-			if(!isEADesktopEntitlementBlacklisted(pEntitlement))
-				pEntitlements->InsertEndChild(pEntitlement->DeepClone(&xmlDoc));
-			pEntitlement = pEntitlement->NextSiblingElement("entitlement");
+			delete newStr;
+			return data;
 		}
-
-		XMLPrinter printer;
-		xmlDoc.Print(&printer);
-
-		*str = printer.CStr(); // copy constructor
-
-		logger->debug("Modified response: \n{}", printer.CStr());
-		logger->info("Inserted {} entitlements: {}", inserted);
-	} while(false);
-
-	return str;
+	}
 }
-
-#endif

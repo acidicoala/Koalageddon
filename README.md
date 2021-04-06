@@ -23,6 +23,11 @@ This project is a dynamic library which performs the main function of Koalageddo
 The solution uses a number of third party dependencies, which are available via [vcpkg].
 Projects in the solution are configured to use static libraries instead of dynamic. If you wish to build the solution yourself, you would need to install following libraries:
 
+* [Boost preprocessor]:
+	```
+	vcpkg install boost-preprocessor:x86-windows-static
+	vcpkg install boost-preprocessor:x64-windows-static
+	```
 * [PolyHook 2.0]:
 	```
 	vcpkg install polyhook2:x86-windows-static
@@ -70,6 +75,7 @@ ___
 [WinReg]: https://github.com/GiovanniDicanio/WinReg
 [C++ Requests]: https://github.com/whoshuu/cpr
 [TinyXML-2]: https://github.com/leethomason/tinyxml2
+[Boost Preprocessor]: https://github.com/boostorg/preprocessor
 
 [Zero Clause BSD]: https://choosealicense.com/licenses/0bsd/
 [LICENSE.txt]: ./LICENSE.txt

@@ -2,7 +2,7 @@
 #include "eos_hooks.h"
 #include "Epic.h"
 
-#define GET_PROXY_FUNC(FUNC) \
+#define GET_ORIGINAL_FUNC(FUNC) \
 	static auto proxyFunc = PLH::FnCast(BasePlatform::trampolineMap[#FUNC], FUNC);
 
 static vector<string> entitlements;
@@ -61,7 +61,7 @@ void EOS_CALL EOS_Ecom_QueryOwnership(
 	container->clientData = ClientData;
 	container->originalCallback = CompletionDelegate;
 
-	GET_PROXY_FUNC(EOS_Ecom_QueryOwnership);
+	GET_ORIGINAL_FUNC(EOS_Ecom_QueryOwnership);
 	proxyFunc(Handle, Options, container, QueryOwnershipCallback);
 }
 
@@ -107,7 +107,7 @@ uint32_t EOS_CALL EOS_Ecom_GetEntitlementsCount(
 	if(entitlementCount == 0)
 	{
 		logger->warn("No entitlements were queried. Redirecting to original function.");
-		GET_PROXY_FUNC(EOS_Ecom_GetEntitlementsCount);
+		GET_ORIGINAL_FUNC(EOS_Ecom_GetEntitlementsCount);
 		entitlementCount = proxyFunc(Handle, Options);
 	}
 
@@ -128,7 +128,7 @@ EOS_EResult EOS_CALL EOS_Ecom_CopyEntitlementByIndex(
 	if(Options->EntitlementIndex >= entitlements.size())
 	{
 		logger->warn("Out of bounds entitlement index. Redirecting to original function.");
-		GET_PROXY_FUNC(EOS_Ecom_CopyEntitlementByIndex);
+		GET_ORIGINAL_FUNC(EOS_Ecom_CopyEntitlementByIndex);
 		return proxyFunc(Handle, Options, OutEntitlement);
 	}
 	else
