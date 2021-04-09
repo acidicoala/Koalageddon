@@ -132,7 +132,7 @@ void askForAction(
 )
 {
 	TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
-	auto szTitle = L"Koalageddon Wizard";
+	auto szTitle = stow(fmt::format("Koalageddon Wizard v{}", VERSION));
 	auto szHeader = L"Welcome to the Koalageddon wizard.";
 	auto szBodyText =
 		L"Please select the platform for which you wish to install/remove integrations";
@@ -161,7 +161,7 @@ void askForAction(
 	tdc.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_USE_COMMAND_LINKS | TDF_EXPAND_FOOTER_AREA | TDF_ENABLE_HYPERLINKS;
 	tdc.pButtons = aCustomButtons;
 	tdc.cButtons = _countof(aCustomButtons);
-	tdc.pszWindowTitle = szTitle;
+	tdc.pszWindowTitle = szTitle.c_str();
 	tdc.pszMainIcon = TD_INFORMATION_ICON;
 	tdc.pszMainInstruction = szHeader;
 	tdc.cRadioButtons = (UINT) radioButtons.size();
