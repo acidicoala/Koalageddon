@@ -30,8 +30,8 @@ void fetchEntitlements()
 {
 	logger->debug("Fetching Origin entitlements");
 
-	auto originXml = readFileContents(ORIGIN_XML_PATH.string());
-	auto etag = readFileContents(ETAG_PATH.string());
+	auto originXml = readFileContents(ORIGIN_XML_PATH);
+	auto etag = readFileContents(ETAG_PATH);
 
 	// If the file is empty, then reset etag
 	if(originXml.empty())
@@ -107,7 +107,7 @@ void readEntitlementsFromFile()
 {
 	logger->debug("Reading origin entitlements from cache");
 
-	auto fileContent = readFileContents(ORIGIN_XML_PATH.string());
+	auto fileContent = readFileContents(ORIGIN_XML_PATH);
 
 	if(fileContent.empty())
 	{

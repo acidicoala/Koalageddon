@@ -7,16 +7,6 @@ using namespace IntegrationWizard;
 
 vector<wstring> IntegrationWizard::alteredPlatforms;
 
-path getVersionDllPath(Architecture architecture)
-{
-	PWSTR rawPath;
-	auto folderID = architecture == Architecture::x32 ? FOLDERID_SystemX86 : FOLDERID_System;
-	SHGetKnownFolderPath(folderID, NULL, NULL, &rawPath);
-	auto systemPath = absolute(rawPath);
-	CoTaskMemFree(rawPath);
-	return systemPath / "version.dll";
-}
-
 void showPostActionReport(Action action)
 {
 	auto actionedString = action == Action::INSTALL_INTEGRATIONS ? "installed" : "removed";
@@ -58,6 +48,12 @@ void installIntegration(const PlatformInstallation& platform)
 	killProcess(platform.process);
 
 	copy_file(integrationDllPath, versionDLLPath, copy_options::overwrite_existing);
+
+	// TODO: This code is temporary.
+	// It is meant to clean-up integration artifacts from previous versions.
+	// It needs to be remove after several releases.
+	auto originalDLLPath = platform.path / "version_o.dll";
+	DeleteFile(originalDLLPath.c_str());
 }
 
 void removeIntegration(const PlatformInstallation& platform)

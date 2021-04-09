@@ -26,6 +26,7 @@
 #pragma warning(disable: ALL_CODE_ANALYSIS_WARNINGS)
 
 #define SPDLOG_WCHAR_TO_UTF8_SUPPORT
+#define SPDLOG_WCHAR_FILENAMES
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/null_sink.h>

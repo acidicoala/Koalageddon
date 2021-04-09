@@ -3,8 +3,10 @@
 #include "Logger.h"
 
 // Source: https://github.com/saeedirha/DLL-Injector
-int injectDLL(const int pid, wstring dllPath)
+int injectDLL(const int pid, path dllPath)
 {
+	auto wDllPath = dllPath.wstring();
+
 	// 1. Get handle to the process
 	auto processHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
 	if(processHandle == NULL)
@@ -13,8 +15,8 @@ int injectDLL(const int pid, wstring dllPath)
 		return ERROR_PROCESS_OPEN;
 	}
 
-	// 2. Allocte memory in that process
-	auto dllPathSize = 2 * (dllPath.length() + 1);
+	// 2. Allocte memory in that process (tiny memory leak, no big deal)
+	auto dllPathSize = 2 * (wDllPath.length() + 1);
 	auto dllPathAddress = VirtualAllocEx(processHandle, NULL, dllPathSize, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 	if(dllPathAddress == NULL)
 	{
@@ -24,7 +26,7 @@ int injectDLL(const int pid, wstring dllPath)
 	}
 
 	// 3. Write DLL path into the newly allocated memory space
-	auto writeSuccess = WriteProcessMemory(processHandle, dllPathAddress, dllPath.c_str(), dllPathSize, NULL);
+	auto writeSuccess = WriteProcessMemory(processHandle, dllPathAddress, wDllPath.c_str(), dllPathSize, NULL);
 	if(!writeSuccess)
 	{
 		logger->error("Failed to write in memory of the target process. Error code: {}", GetLastError());
@@ -37,9 +39,6 @@ int injectDLL(const int pid, wstring dllPath)
 	if(threadHandle == NULL)
 	{
 		logger->error("Failed to create a remote thread in the target process. Error code: {}", GetLastError());
-		logger->error("\tprocHandle: {}", (void*) processHandle);
-		logger->error("\tloadLibraryAddress: {}", (void*) &LoadLibraryA);
-		logger->error("\tdllPathAddress: {}", (void*) dllPathAddress);
 		CloseHandle(processHandle);
 		return ERROR_REMOTE_THREAD;
 	}

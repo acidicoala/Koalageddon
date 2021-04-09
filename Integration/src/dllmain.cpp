@@ -50,7 +50,7 @@ void init(HMODULE hModule)
 	}
 	else
 	{
-		logger->info("Successfully loaded original DLL at: '{}'", originalPath.string());
+		logger->info(L"Successfully loaded original DLL at: '{}'", originalPath.wstring());
 	}
 
 	auto currentProcess = getCurrentProcessName();
@@ -69,7 +69,7 @@ void init(HMODULE hModule)
 			}
 
 			auto unlockerPath = getInstallDirPath() / UNLOCKER_DLL;
-			logger->info("Unlocker path: '{}'", unlockerPath.string());
+			logger->info(L"Unlocker path: '{}'", unlockerPath.wstring());
 
 			hUnlocker = LoadLibrary(unlockerPath.wstring().c_str());
 			if(hUnlocker == NULL)

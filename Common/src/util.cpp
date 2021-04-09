@@ -2,8 +2,6 @@
 #include "util.h"
 #include "Logger.h"
 #include "constants.h"
-#include <iterator> // ???
-
 
 bool contains(wstring haystack, wstring needle)
 {
@@ -71,7 +69,7 @@ path getCurrentProcessPath()
 {
 	TCHAR buffer[MAX_PATH];
 
-	if(GetModuleFileName(NULL, buffer, MAX_PATH) == NULL)
+	if(!GetModuleFileName(NULL, buffer, MAX_PATH))
 		logger->error("Failed to get current process file name. Error code: {}", GetLastError());
 
 	return absolute(buffer);
@@ -141,26 +139,26 @@ path getPathFromRegistry(string value)
 
 path getWorkingDirPath()
 {
-	// TODO: static?
-	return getPathFromRegistry(WORKING_DIR);
+	static auto path = getPathFromRegistry(WORKING_DIR);
+	return path;
 }
 
 path getCacheDirPath()
 {
-	// TODO: static?
-	return getWorkingDirPath() / "cache";
+	static auto path = getWorkingDirPath() / "cache";
+	return path;
 }
 
 path getInstallDirPath()
 {
-	// TODO: static?
-	return getPathFromRegistry(INSTALL_DIR);
+	static auto path = getPathFromRegistry(INSTALL_DIR);
+	return path;
 }
 
 path getConfigPath()
 {
-	// TODO: static?
-	return getWorkingDirPath() / CONFIG_NAME;
+	static auto path = getWorkingDirPath() / CONFIG_NAME;
+	return path;
 }
 
 bool is32bit(DWORD PID)
@@ -244,20 +242,20 @@ char* makeCStringCopy(string src)
 	return dest;
 }
 
-string getReg(string key, string valueName)
+wstring getReg(string key, string valueName)
 {
 	winreg::RegKey regKey{ HKEY_LOCAL_MACHINE, stow(key).c_str(), KEY_WOW64_32KEY | KEY_READ };
-	return wtos(regKey.GetStringValue(stow(valueName)));
+	return regKey.GetStringValue(stow(valueName));
 }
 
 // Should be called only from InstallationWizard, since writing to HKLM requires admin rights.
-void setReg(string key, string valueName, string data)
+void setReg(string key, string valueName, wstring data)
 {
 	winreg::RegKey regKey{ HKEY_LOCAL_MACHINE, stow(key).c_str(), KEY_WOW64_32KEY | KEY_ALL_ACCESS };
-	regKey.SetStringValue(stow(valueName), stow(data));
+	regKey.SetStringValue(stow(valueName), data);
 }
 
-string readFileContents(string path)
+string readFileContents(path path)
 {
 	std::ifstream fileStream(path);
 	if(fileStream.good())
@@ -279,7 +277,7 @@ bool writeFileContents(path filePath, string contents)
 	}
 	else
 	{
-		logger->error("Failed to write to file: {}", filePath.string());
+		logger->error(L"Failed to write to file: {}", filePath.wstring());
 		return false;
 	}
 }

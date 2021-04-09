@@ -56,15 +56,15 @@ string toLower(string str);
 bool stringsAreEqual(string one, string two, bool insensitive = true);
 
 // Registry
-string getReg(string key, string valueName);
-void setReg(string key, string valueName, string data);
+wstring getReg(string key, string valueName);
+void setReg(string key, string valueName, wstring data);
 path getWorkingDirPath();
 path getInstallDirPath();
 path getCacheDirPath();
 path getConfigPath();
 
 // File access
-string readFileContents(string path);
+string readFileContents(path path);
 bool writeFileContents(path filePath, string contents);
 
 // Message Box helpers

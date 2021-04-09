@@ -28,7 +28,7 @@ void SteamClient::readCachedPatterns()
 {
 	logger->debug("Reading SteamClient patterns from cache");
 
-	auto text = readFileContents(PATTERNS_FILE_PATH.string());
+	auto text = readFileContents(PATTERNS_FILE_PATH);
 
 	if(text.empty())
 	{
@@ -42,7 +42,7 @@ void SteamClient::readCachedPatterns()
 		json::parse(text, nullptr, true, true).get_to(patterns);
 	} catch(json::exception& ex)
 	{
-		logger->error("Error parsing {}: {}", PATTERNS_FILE_PATH.string(), ex.what());
+		logger->error(L"Error parsing {}: {}", PATTERNS_FILE_PATH.wstring(), stow(ex.what()));
 		return;
 	}
 

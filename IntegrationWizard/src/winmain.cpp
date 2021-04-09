@@ -20,17 +20,15 @@ wstring getEnvVar(wstring key)
 	return absolute(buffer);
 }
 
-path getAppDataPath()
+path getProgramDataPath()
 {
-	return absolute(getEnvVar(L"AppData"));
+	return absolute(getEnvVar(L"ProgramData"));
 }
 
 path getDesktopPath()
 {
 	return absolute(getEnvVar(L"UserProfile")) / "Desktop";
 }
-
-
 
 HRESULT createShortcut(wstring targetLocation, wstring shortcutLocation, wstring description)
 {
@@ -69,9 +67,9 @@ HRESULT createShortcut(wstring targetLocation, wstring shortcutLocation, wstring
 }
 
 void firstSetup()
-{
-	setReg(KOALAGEDDON_KEY, INSTALL_DIR, getCurrentProcessPath().parent_path().string());
-	setReg(KOALAGEDDON_KEY, WORKING_DIR, (getAppDataPath() / ACIDICOALA / KOALAGEDDON).string());
+{ 
+	setReg(KOALAGEDDON_KEY, INSTALL_DIR, getCurrentProcessPath().parent_path().wstring());
+	setReg(KOALAGEDDON_KEY, WORKING_DIR, (getProgramDataPath() / ACIDICOALA / KOALAGEDDON).wstring());
 
 	// Load the default config into memory
 	HRSRC hResource = FindResource(nullptr, MAKEINTRESOURCE(IDR_DEFAULT_CONFIG), L"CONFIG");

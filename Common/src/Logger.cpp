@@ -22,7 +22,7 @@ void init(string loggerName, bool truncate)
 		auto fileName = fmt::format("{}.{}.log", loggerName, processName);
 		auto path = getLogsDirPath() / fileName;
 
-		logger = spdlog::basic_logger_mt(loggerName, path.u8string(), truncate);
+		logger = spdlog::basic_logger_mt(loggerName, path.wstring(), truncate);
 		logger->set_pattern("[%H:%M:%S.%e] [%l]\t%v");
 		logger->set_level(spdlog::level::from_str(config->log_level));
 		logger->flush_on(spdlog::level::debug);

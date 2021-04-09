@@ -5,10 +5,9 @@
 #include "Logger.h"
 #include "Config.h"
 
-// Hide console window
-#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
-
-int main(int argc, char** argv)
+// Hide console window & use wmain instead of main
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:wmainCRTStartup")
+int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 {
 	Config::init();
 	Logger::init("Injector", false);
@@ -24,10 +23,10 @@ int main(int argc, char** argv)
 	try
 	{
 		auto PID = (DWORD) std::stoi(argv[1]);
-		auto dllPath = stow(argv[2]);
+		auto dllPath = absolute(argv[2]);
 
 		logger->info(L"Injecting DLL into '{}'", getProcessName(PID));
-		logger->debug(L"PID: {}, dllPath: '{}'", PID, dllPath);
+		logger->debug(L"PID: {}, dllPath: '{}'", PID, dllPath.wstring());
 
 		auto result = injectDLL(PID, dllPath);
 
@@ -43,7 +42,7 @@ int main(int argc, char** argv)
 		return result;
 	} catch(std::logic_error&)
 	{
-		logger->error("Failed to convert PID {} to int", argv[1]);
+		logger->error(L"Failed to convert PID {} to int", argv[1]);
 		return ERROR_INVALID_ARGUMENTS;
 	}
 }

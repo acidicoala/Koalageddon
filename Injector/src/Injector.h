@@ -14,4 +14,4 @@ enum ExitCode
 	ERROR_REMOTE_THREAD
 };
 
-int injectDLL(const int pid, wstring DLL_Path);
+int injectDLL(const int pid, path DLL_Path);

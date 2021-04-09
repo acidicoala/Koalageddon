@@ -17,6 +17,7 @@ HMODULE hOriginal = NULL;
 #endif
 
 #define ARGS(...) __VA_ARGS__
+
 #define FUNC_IMPL(TYPE, NAME, ...) \
 extern "C" TYPE __cdecl __##NAME(BOOST_PP_SEQ_FOR_EACH_I(WRAP_declare_param, ~, BOOST_PP_TUPLE_TO_SEQ((__VA_ARGS__)))) { \
 	__pragma(comment(linker, "/EXPORT:"#NAME"=__" PREFIX #NAME)) \
