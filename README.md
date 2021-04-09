@@ -1,5 +1,6 @@
 ﻿# 🐨 Koalageddon 💥
-#### Legit DLC Unlocker for Steam, Epic, Origin, EA Desktop & Uplay (R1)
+<font size="3">**Legit DLC Unlocker for Steam, Epic, Origin, EA Desktop & Uplay (R1)**</font> 
+
 Welcome to the Koalageddon repository.
 For user-friendly introduction or support, please check out the [official forum thread]. This document is meant for software developers.
 
@@ -21,50 +22,23 @@ This project is a dynamic library which performs the main function of Koalageddo
 
 ## 🛠 Dependencies
 The solution uses a number of third party dependencies, which are available via [vcpkg].
-Projects in the solution are configured to use static libraries instead of dynamic. If you wish to build the solution yourself, you would need to install following libraries:
+Projects in the solution are configured to use static libraries instead of dynamic. If you wish to build the solution yourself, you would need to install the following libraries:
 
-* [Boost preprocessor]:
-	```
-	vcpkg install boost-preprocessor:x86-windows-static
-	vcpkg install boost-preprocessor:x64-windows-static
-	```
-* [PolyHook 2.0]:
-	```
-	vcpkg install polyhook2:x86-windows-static
-	vcpkg install polyhook2:x64-windows-static
-	```
-* [WinReg]:
-	```
-	vcpkg install winreg:x86-windows-static
-	vcpkg install winreg:x64-windows-static
-	```
-* [spdlog]:
-	```
-	vcpkg install spdlog:x86-windows-static
-	vcpkg install spdlog:x64-windows-static
-	```
-* [nlohmann JSON]:
-	```
-	vcpkg install nlohmann-json:x86-windows-static
-	vcpkg install nlohmann-json:x64-windows-static
-	```
-* [TinyXML-2]
-	```
-	vcpkg install tinyxml2:x86-windows-static
-	vcpkg install tinyxml2:x64-windows-static
-	```
+* [Boost preprocessor]
 * [C++ Requests]
-	```
-	vcpkg install cpr:x86-windows-static
-	vcpkg install cpr:x64-windows-static
-	```
+* [nlohmann JSON]
+* [PolyHook 2.0]
+* [spdlog]
+* [TinyXML-2]
+* [WinReg]
+
+The solution includes the [install_vcpkg_dependencies.bat] script, which installs all of the above-mentioned dependencies with a single command.
 
 You can verify installations via `vcpkg list`
 
 ## 📄 License
 This software is licensed under [Zero Clause BSD] license, terms of which are available in [LICENSE.txt]
 
-___
 
 [official forum thread]: https://cs.rin.ru/forum/viewtopic.php?f=10&t=112021
 [Task Dialog]: https://docs.microsoft.com/en-us/windows/win32/controls/task-dialogs-overview#:~:text=A%20task%20dialog%20is%20a,features%20than%20a%20message%20box.
@@ -76,6 +50,7 @@ ___
 [C++ Requests]: https://github.com/whoshuu/cpr
 [TinyXML-2]: https://github.com/leethomason/tinyxml2
 [Boost Preprocessor]: https://github.com/boostorg/preprocessor
+[install_vcpkg_dependencies.bat]: ./install_vcpkg_dependencies.bat
 
 [Zero Clause BSD]: https://choosealicense.com/licenses/0bsd/
 [LICENSE.txt]: ./LICENSE.txt
