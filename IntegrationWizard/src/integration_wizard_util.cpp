@@ -52,6 +52,8 @@ bool changeOwnership(LPCWSTR objectPath, WELL_KNOWN_SID_TYPE wellKnownSidType)
 
 	WCHAR objPath[MAX_PATH]; // Copy string into a buffer, since some functions do not accept const ptr
 	wcscpy_s(objPath, objectPath);
+#pragma warning(disable : 6054) // VS incorrectly warns that the string might not be terminated.
+
 
 	// Open a handle to the access token for the calling process.
 	HANDLE hToken = NULL;
@@ -111,7 +113,6 @@ bool changeOwnership(LPCWSTR objectPath, WELL_KNOWN_SID_TYPE wellKnownSidType)
 	}
 
 	// Finally, apply the permissions
-#pragma warning(disable : 6054) // VS incorrectly warns that the string might not be terminated.
 	result = SetNamedSecurityInfo(objPath, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, 0, 0, pNewDACL, 0);
 	if(result != ERROR_SUCCESS)
 	{
