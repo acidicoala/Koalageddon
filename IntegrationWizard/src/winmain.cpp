@@ -1,73 +1,13 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Logger.h"
 #include "Config.h"
 #include "constants.h"
 #include "IntegrationWizard.h"
+#include "integration_wizard_util.h"
 #include "../resource.h"
 
-void fatalError(string message)
-{
-	message = fmt::format("{}. Error code: 0x{:X}", message, GetLastError());
-	MessageBoxA(NULL, message.c_str(), "Fatal Error", MB_ICONERROR | MB_OK);
-	exit(1);
-}
-
-wstring getEnvVar(wstring key)
-{
-	TCHAR buffer[MAX_PATH];
-	GetEnvironmentVariable(key.c_str(), buffer, MAX_PATH);
-
-	return absolute(buffer);
-}
-
-path getProgramDataPath()
-{
-	return absolute(getEnvVar(L"ProgramData"));
-}
-
-path getDesktopPath()
-{
-	return absolute(getEnvVar(L"UserProfile")) / "Desktop";
-}
-
-HRESULT createShortcut(wstring targetLocation, wstring shortcutLocation, wstring description)
-{
-	HRESULT hres = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-	if(SUCCEEDED(hres))
-	{
-		IShellLink* psl = NULL;
-
-		// Get a pointer to the IShellLink interface. It is assumed that CoInitialize
-		// has already been called.
-		hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*) &psl);
-		if(SUCCEEDED(hres))
-		{
-			IPersistFile* ppf = NULL;
-
-			// Set the path to the shortcut target and add the description. 
-			psl->SetPath(targetLocation.c_str());
-			psl->SetDescription(description.c_str());
-
-			// Query IShellLink for the IPersistFile interface, used for saving the 
-			// shortcut in persistent storage. 
-			hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*) &ppf);
-
-			if(SUCCEEDED(hres))
-			{
-				// Save the link by calling IPersistFile::Save. 
-				hres = ppf->Save(shortcutLocation.c_str(), TRUE);
-				ppf->Release();
-			}
-			psl->Release();
-		}
-		CoUninitialize();
-	}
-
-	return hres;
-}
-
 void firstSetup()
-{ 
+{
 	setReg(KOALAGEDDON_KEY, INSTALL_DIR, getCurrentProcessPath().parent_path().wstring());
 	setReg(KOALAGEDDON_KEY, WORKING_DIR, (getProgramDataPath() / ACIDICOALA / KOALAGEDDON).wstring());
 
@@ -133,7 +73,7 @@ void askForAction(
 {
 	TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
 	auto szTitle = stow(fmt::format("Koalageddon Wizard v{}", VERSION));
-	auto szHeader = L"Welcome to the Koalageddon wizard.";
+	auto szHeader = L"Welcome to the Koalageddon wizard";
 	auto szBodyText =
 		L"Please select the platform for which you wish to install/remove integrations";
 
@@ -154,8 +94,11 @@ void askForAction(
 	  { (int) Action::REMOVE_INTEGRATIONS, L"&Remove platform integrations" }
 	};
 
-	LPCWSTR szFooter =
-		LR"(<a href="https://github.com/acidicoala/Koalageddon/releases">Download latest release</a>)";
+	auto wFooter = fmt::format(
+		LR"(🌐 <a href="{0}">Open latest release page</a>  ({0})
+
+			📂 <a href="{1}">Open config directory</a>  ({1}))"
+		, L"https://github.com/acidicoala/Koalageddon/releases", getConfigPath().parent_path().wstring());
 
 	tdc.hInstance = hInstance;
 	tdc.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_USE_COMMAND_LINKS | TDF_EXPAND_FOOTER_AREA | TDF_ENABLE_HYPERLINKS;
@@ -170,8 +113,8 @@ void askForAction(
 	tdc.pszContent = szBodyText;
 	tdc.pszExpandedInformation = szExpandedInformation;
 	tdc.pszVerificationText = L"Create desktop shortcut to configuration file";
-	tdc.pszFooter = szFooter;
-	tdc.pszFooterIcon = TD_INFORMATION_ICON;
+	tdc.pszFooter = wFooter.c_str();
+	// tdc.pszFooterIcon = TD_INFORMATION_ICON;
 	tdc.pfCallback = [](HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LONG_PTR lpRefData)->HRESULT
 	{
 		if(msg == TDN_HYPERLINK_CLICKED)
@@ -207,10 +150,12 @@ int APIENTRY wWinMain(
 	Logger::init("IntegrationWizard", true);
 	logger->info("Integration Wizard v{}", VERSION);
 
+	// Files created by the Integration Wizard will belong to Administrators.
+	// Therefore, we need to change their ownership to Users.
+	changeOwnership(getWorkingDirPath().parent_path().c_str(), WinBuiltinUsersSid);
+
 	// We need to disable WOW64 redirections because otherwise 32bit application
 	// uses SysWOW64 directory even if System32 was explicitly provided.
-	void* oldVal = NULL;
-	Wow64DisableWow64FsRedirection(&oldVal);
 
 	auto platforms = IntegrationWizard::getInstalledPlatforms();
 
@@ -236,11 +181,13 @@ int APIENTRY wWinMain(
 		case Action::REMOVE_INTEGRATIONS:
 			IntegrationWizard::alterPlatform(action, platformID, platforms);
 			if(shouldCreateShortcut)
+			{
 				createShortcut(
 					getConfigPath().wstring(),
 					(getDesktopPath() / "Config.lnk").wstring(),
 					L"Kolageddon Configuration File"
 				);
+			}
 			break;
 		case Action::NOTHING_TO_INSTALL:
 			MessageBox(NULL, L"Koalageddon did not find any installed platforms.", L"Nothing found", MB_ICONINFORMATION);
@@ -249,7 +196,6 @@ int APIENTRY wWinMain(
 			fatalError("Unexpected action result");
 	}
 
-	Wow64RevertWow64FsRedirection(oldVal);
 	return 0;
 }
 

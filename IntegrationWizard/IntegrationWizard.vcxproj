@@ -222,6 +222,7 @@
     <Image Include="..\icon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\integration_wizard_util.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\framework.h" />
     <ClInclude Include="src\IntegrationWizard.h" />
@@ -229,6 +230,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\IntegrationWizard.cpp" />
+    <ClCompile Include="src\integration_wizard_util.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

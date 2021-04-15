@@ -83,10 +83,13 @@ void CALLBACK dllCallback(ULONG NotificationReason, PLDR_DLL_NOTIFICATION_DATA N
 			platforms.back()->init();
 		}*/
 		else if(dllName == EA_DESKTOP)
-		{
-			logger->info(L"EA Desktop DLL has been detected");
-			platforms.push_back(make_unique<EADesktop>(NotificationData->Loaded.FullDllName->Buffer));
-			platforms.back()->init();
+		{// Additional filter since same dll is loaded by origin too
+			if(stringsAreEqual(getCurrentProcessName(), config->platformRefs.EADesktop.process))
+			{
+				logger->info(L"EA Desktop DLL has been detected");
+				platforms.push_back(make_unique<EADesktop>(NotificationData->Loaded.FullDllName->Buffer));
+				platforms.back()->init();
+			}
 		}
 	}
 }
@@ -136,17 +139,13 @@ void checkLoadedDlls()
 	}*/
 	else if(handle = GetModuleHandle(EA_DESKTOP))
 	{
-		logger->info(L"EA Desktop DLL is already loaded");
-		platforms.push_back(make_unique<EADesktop>(handle));
-		platforms.back()->init();
+		if(stringsAreEqual(getCurrentProcessName(), config->platformRefs.EADesktop.process))
+		{
+			logger->info(L"EA Desktop DLL is already loaded");
+			platforms.push_back(make_unique<EADesktop>(handle));
+			platforms.back()->init();
+		}
 	}
-	else
-	{
-		return;
-	}
-
-	// Don't need to dispose it, actually
-	// CloseHandle(handle);
 }
 
 PVOID cookie = NULL;
