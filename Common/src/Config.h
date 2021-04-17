@@ -15,6 +15,7 @@ struct SteamPlatform : Platform
 {
 	bool unlock_dlc = true;
 	bool unlock_shared_library = false;
+	vector<string> app_blacklist;
 };
 
 struct Platforms

@@ -98,7 +98,7 @@ void askForAction(
 		LR"(🌐 <a href="{0}">Open latest release page</a>  ({0})
 
 			📂 <a href="{1}">Open config directory</a>  ({1}))"
-		, L"https://github.com/acidicoala/Koalageddon/releases", getConfigPath().parent_path().wstring());
+		, L"https://github.com/acidicoala/Koalageddon/releases/latest", getConfigPath().parent_path().wstring());
 
 	tdc.hInstance = hInstance;
 	tdc.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_USE_COMMAND_LINKS | TDF_EXPAND_FOOTER_AREA | TDF_ENABLE_HYPERLINKS;

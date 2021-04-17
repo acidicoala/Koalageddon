@@ -12,6 +12,7 @@ void from_json(const json& j, SteamPlatform& p)
 	from_json(j, (Platform&) p);
 	j["unlock_shared_library"].get_to(p.unlock_shared_library);
 	j["unlock_dlc"].get_to(p.unlock_dlc);
+	j["app_blacklist"].get_to(p.app_blacklist);
 }
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Platforms, Steam, EpicGames, Origin, EADesktop, UplayR1)

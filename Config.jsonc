@@ -1,5 +1,5 @@
 {
-	"config_version": 5, // DO NOT EDIT THIS VALUE
+	"config_version": 6, // DO NOT EDIT THIS VALUE
 	"log_level": "debug",
 	"platforms": {
 		"Steam": {
@@ -8,6 +8,9 @@
 			"replicate": false,
 			"unlock_dlc": true,
 			"unlock_shared_library": false,
+			"app_blacklist": [
+				"976310" // Mortal Kombat 11
+			],
 			"blacklist": [ // Get App ID from SteamDB
 				"22618", // Alien Breed: Impact - PL Check [Do not force polish language]
 				"67379" // Darkness II Low Violence [Do not censor violence]
