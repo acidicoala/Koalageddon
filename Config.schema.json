@@ -1,0 +1,183 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://raw.githubusercontent.com/acidicoala/Koalageddon/master/Config.schema.json",
+	"title": "Koalageddon Config",
+	"type": "object",
+	"definitions": {
+		"string_array": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"platform": {
+			"comment": "Cannot set 'additionalProperties' to 'false' here...",
+			"properties": {
+				"enabled": {
+					"type": "boolean",
+					"title": "Enabled",
+					"description": "If this boolean option is set to 'true', then Koalageddon will inject the unlocker dll into the platform process. In other words, you can enable/disable the unlocker in specific platforms using this option. By default all platforms are enabled. Obviously, this option will have any effect only if you have installed integrations for the corresponding platforms."
+				},
+				"process": {
+					"type": "string",
+					"title": "Process name",
+					"description": "The name of the target process. Typically you don't need to edit this since I already provided the correct process name for each platform. However, if in the future one of the platform decides to change its main executable name, then this option will come in handy."
+				},
+				"replicate": {
+					"type": "boolean",
+					"title": "Replicate",
+					"description": "If this boolean option is set to 'true', then not only the unlocker dll will be injected into the platform process, but also in all processes that are started by the platform, which are typically games or game launchers. Normally you should not change this value since it is already filled with necessary default parameters. For Epic Games & Uplay this option is enabled because Koalageddon needs to inject itself into games launched by corresponding platforms to intercept DLC requests. For Origin & Steam this option is disabled because all DLC requests can be intercepted at the platform process itself. Steam integration can actually work using either of the methods, so you could enable DLL injection in Steam games if you enable this option, but I don't suggest this."
+				},
+				"blacklist": {
+					"$ref": "#/definitions/string_array",
+					"title": "DLC Blacklist",
+					"items": {
+						"title": "DLC ID"
+					}
+				},
+				"ignore": {
+					"$ref": "#/definitions/string_array",
+					"title": "Ignored processes",
+					"description": "If the 'replicate' option is set to 'true', then Koalageddon will inject unlocker dll into every new process started by the platform except for the ones defined in this very list. In this case you can put here the executable names of games that are protected by anti-cheat or similar tool. The default list includes various helper-utilities used by platforms themselves, which are of no interest to Koalageddon.",
+					"items": {
+						"title": "Process"
+					}
+				}
+			},
+			"required": [
+				"enabled",
+				"process",
+				"replicate",
+				"blacklist",
+				"ignore"
+			]
+		}
+	},
+	"properties": {
+		"config_version": {
+			"title": "Config version",
+			"description": "Do not edit the value of this option. It may be used in some future developments",
+			"type": "number",
+			"minimum": 1,
+			"multipleOf": 1.0
+		},
+		"log_level": {
+			"title": "Log level",
+			"description": "How detailed should the logs be. 'debug' shows all possible logs. 'off' disables logs completely.",
+			"type": "string",
+			"enum": [
+				"debug",
+				"info",
+				"warning",
+				"error",
+				"off"
+			]
+		},
+		"platforms": {
+			"title": "Platforms",
+			"description": "This section contains platform-specific options",
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"Steam": {
+					"$ref": "#/definitions/platform",
+					"description": "https://store.steampowered.com/",
+					"properties": {
+						"unlock_dlc": {
+							"type": "boolean",
+							"title": "Unlock DLC",
+							"description": "This option enables or disables DLC unlocking. This might be useful if you wish to use only the Family Sharing bypass, without the DLC unlocking features."
+						},
+						"unlock_shared_library": {
+							"type": "boolean",
+							"title": "Unlock Shared Library",
+							"description": "Setting this option to 'true' automatically unlocks the borrowed games that are normally locked when the library owner opens any game."
+						},
+						"app_blacklist": {
+							"$ref": "#/definitions/string_array",
+							"title": "App Blacklist",
+							"description": "Same as DLC blacklist, but for games. You can put here App ID of the game and Koalageddon will not alter DLC ownership in this game at all. The game will receive legit ownerships. You can get the App ID from SteamDB.",
+							"items": {
+								"title": "App ID"
+							}
+						},
+						"blacklist": {
+							"description": "By default Koalageddon will try to unlock all DLCs that it can. However, if you wish for some DLCs to be locked, you can add corresponding DLC ID into this list. You can get DLC ID from SteamDB."
+						}
+					},
+					"required": [
+						"unlock_dlc",
+						"unlock_shared_library",
+						"app_blacklist"
+					]
+				},
+				"EpicGames": {
+					"$ref": "#/definitions/platform",
+					"title": "Epic Games",
+					"description": "https://www.epicgames.com/",
+					"properties": {
+						"blacklist": {
+							"description": "By default Koalageddon will try to unlock all DLCs that it can. However, if you wish for some DLCs to be locked, you can add corresponding DLC ID into this list. You can get DLC ID from ScreamDB.",
+							"items": {
+								"title": "DLC ID"
+							}
+						}
+					}
+				},
+				"Origin": {
+					"$ref": "#/definitions/platform",
+					"description": "https://www.origin.com/",
+					"properties": {
+						"blacklist": {
+							"description": "By default Koalageddon will try to unlock all DLCs that it can. However, if you wish for some DLCs to be locked, you can add corresponding DLC ID into this list. Use ItemId from Unlocker32.Origin.log."
+						}
+					}
+				},
+				"EADesktop": {
+					"$ref": "#/definitions/platform",
+					"title": "EA Desktop",
+					"description": "https://www.ea.com/ea-desktop-beta",
+					"properties": {
+						"blacklist": {
+							"description": "By default Koalageddon will try to unlock all DLCs that it can. However, if you wish for some DLCs to be locked, you can add corresponding DLC ID into this list. Use ItemId from Unlocker64.EADesktop.log."
+						}
+					}
+				},
+				"UplayR1": {
+					"$ref": "#/definitions/platform",
+					"title": "Ubisoft Connect",
+					"description": "https://ubisoftconnect.com/",
+					"properties": {
+						"blacklist": {
+							"description": "By default Koalageddon will try to unlock all DLCs that it can. However, if you wish for some DLCs to be locked, you can add corresponding DLC ID into this list. Use aUplayId from the log file of the corresponing game."
+						}
+					}
+				}
+			}
+		},
+		"ignore": {
+			"$ref": "#/definitions/string_array",
+			"title": "Ignored processes",
+			"description": "This list specifies which processes Koalageddon will not inject itself, regardless of the platform. For example, we don't want it to be injected in system applications such as command line or registry editor. Keep in mind that all programs under Windows directory are automatically ignored.",
+			"items": {
+				"title": "Process"
+			}
+		},
+		"terminate": {
+			"$ref": "#/definitions/string_array",
+			"title": "Terminate processes",
+			"description": "This list specifies which processes Koalageddon will attempt to terminate when they are launched by a platform. For example, various crash reporters can go here because they send unhealthy amount of your private data to platform servers.",
+			"items": {
+				"title": "Process"
+			}
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"config_version",
+		"log_level",
+		"platforms",
+		"ignore",
+		"terminate"
+	]
+}

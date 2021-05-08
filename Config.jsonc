@@ -54,7 +54,7 @@
 			"enabled": true,
 			"process": "EADesktop.exe",
 			"replicate": false,
-			"blacklist": [ // Use productId from Unlocker64.EADesktop.log
+			"blacklist": [ // Use ItemId from Unlocker64.EADesktop.log
 
 			],
 			"ignore": []
