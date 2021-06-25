@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Koalageddon"
-#define MyAppVersion "1.5.2"
+#define MyAppVersion "1.5.3"
 #define MyAppPublisher "acidicoala"
 #define MyAppURL "https://github.com/acidicoala/Koalageddon"
 #define MyAppExeName "IntegrationWizard32.exe"
