@@ -35,6 +35,14 @@ Projects in the solution are configured to use static libraries instead of dynam
 The solution includes the [install_vcpkg_dependencies.bat] script, which installs all of the above-mentioned dependencies with a single command.
 
 You can verify installations via `vcpkg list`
+## 🔢 Versioning
+
+This project is following semantic versioning schema.
+
+The version information is stored in the following files:
+- [inno_setup.iss] - Used by the setup installer.
+- [Integration.rc] - Used by Integration DLL.
+- [constants.h] -  Used by Koalageddon binaries.
 
 ## 📄 License
 This software is licensed under [Zero Clause BSD] license, terms of which are available in [LICENSE.txt]
@@ -54,3 +62,7 @@ This software is licensed under [Zero Clause BSD] license, terms of which are av
 
 [Zero Clause BSD]: https://choosealicense.com/licenses/0bsd/
 [LICENSE.txt]: ./LICENSE.txt
+
+[inno_setup.iss]: ./inno_setup.iss
+[Integration.rc]: ./Integration/Integration.rc
+[constants.h]: ./Common/src/constants.h
