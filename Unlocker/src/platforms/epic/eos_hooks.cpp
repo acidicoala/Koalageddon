@@ -3,7 +3,7 @@
 #include "Epic.h"
 
 #define GET_ORIGINAL_FUNC(FUNC) \
-	static auto proxyFunc = PLH::FnCast(BasePlatform::trampolineMap[#FUNC], FUNC);
+	static auto proxyFunc = PLH::FnCast(BasePlatform::trampolineMap[STR_##FUNC], FUNC)
 
 static vector<string> entitlements;
 

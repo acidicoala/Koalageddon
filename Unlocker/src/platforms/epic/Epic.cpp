@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Epic.h"
-#include "util.h"
 #include "constants.h"
 #include "eos_hooks.h"
 
