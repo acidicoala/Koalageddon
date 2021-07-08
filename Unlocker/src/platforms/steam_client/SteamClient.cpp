@@ -68,6 +68,12 @@ void SteamClient::installHook(void* hookedFunc, string funcName)
 
 	if(origFuncAddress != nullptr)
 		installDetourHook(hookedFunc, funcName.c_str(), origFuncAddress);
+	else
+		logger->error(
+			"Failed to find the address of function: {}. "
+			"You can report this error to the official forum topic.", 
+			funcName
+		);
 }
 
 void SteamClient::installHooks()

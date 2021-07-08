@@ -38,11 +38,11 @@ void firstSetup()
 			return;
 		}
 
-		auto configJson = nlohmann::json::parse(ifs, nullptr, true, true);
+		auto configJson = json::parse(ifs, nullptr, true, true);
 		auto configVersion = configJson["config_version"].get<int>();
 
 		auto is = std::istringstream(string((char*) dataPtr, dataSize));
-		auto defaultConfigJson = nlohmann::json::parse(is, nullptr, true, true);
+		auto defaultConfigJson = json::parse(is, nullptr, true, true);
 		auto defaultConfigVersion = defaultConfigJson["config_version"].get<int>();
 
 		// Do not copy if the log versions are matching
@@ -51,7 +51,7 @@ void firstSetup()
 	}
 
 	// Copy the default config
-	std::filesystem::create_directories(getConfigPath().parent_path());
+	create_directories(getConfigPath().parent_path());
 	std::ofstream configFile(getConfigPath(), std::ios::out | std::ios::binary);
 	if(!configFile.good())
 	{
@@ -95,10 +95,15 @@ void askForAction(
 	};
 
 	auto wFooter = fmt::format(
-		LR"(🌐 <a href="{0}">Open latest release page</a>  ({0})
+		LR"(📂 <a href="{0}">Open config directory</a>  ({0})
 
-			📂 <a href="{1}">Open config directory</a>  ({1}))"
-		, L"https://github.com/acidicoala/Koalageddon/releases/latest", getConfigPath().parent_path().wstring());
+			🌐 <a href="{1}">Open latest release page</a>  ({1})
+
+			💬 <a href="{2}">Open support forum topic</a>  ({2}))",
+		getConfigPath().parent_path().wstring(),
+		L"https://github.com/acidicoala/Koalageddon/releases/latest", 
+		L"https://cs.rin.ru/forum/viewtopic.php?p=2333491#p2333491"
+	);
 
 	tdc.hInstance = hInstance;
 	tdc.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_USE_COMMAND_LINKS | TDF_EXPAND_FOOTER_AREA | TDF_ENABLE_HYPERLINKS;
@@ -107,7 +112,7 @@ void askForAction(
 	tdc.pszWindowTitle = szTitle.c_str();
 	tdc.pszMainIcon = TD_INFORMATION_ICON;
 	tdc.pszMainInstruction = szHeader;
-	tdc.cRadioButtons = (UINT) radioButtons.size();
+	tdc.cRadioButtons = radioButtons.size();
 	tdc.nDefaultRadioButton = IntegrationWizard::ALL_PLATFORMS;
 	tdc.pRadioButtons = radioButtons.data();
 	tdc.pszContent = szBodyText;
@@ -179,13 +184,13 @@ int APIENTRY wWinMain(
 		case Action::INSTALL_INTEGRATIONS:
 			[[fallthrough]];
 		case Action::REMOVE_INTEGRATIONS:
-			IntegrationWizard::alterPlatform(action, platformID, platforms);
+			alterPlatform(action, platformID, platforms);
 			if(shouldCreateShortcut)
 			{
 				createShortcut(
 					getConfigPath().wstring(),
 					(getDesktopPath() / "Config.lnk").wstring(),
-					L"Kolageddon Configuration File"
+					L"Koalageddon Configuration File"
 				);
 			}
 			break;
