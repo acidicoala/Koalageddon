@@ -66,7 +66,8 @@ void askForAction(
 	int* platformID,
 	BOOL* createShortcut
 ) {
-	TASKDIALOGCONFIG tdc = {sizeof(TASKDIALOGCONFIG), nullptr};
+	TASKDIALOGCONFIG tdc = {};
+	tdc.cbSize = sizeof(TASKDIALOGCONFIG);
 	const auto szTitle = stow(fmt::format("Koalageddon Wizard v{}", VERSION));
 	constexpr auto szHeader = L"Welcome to the Koalageddon wizard";
 	constexpr auto szBodyText = L"Please select the platform for which you wish to install/remove integrations";
@@ -76,7 +77,8 @@ void askForAction(
 		L"During installation/removal platform processes will be terminated, "
 		L"so make sure to close all games and save all data.";
 
-	vector<TASKDIALOG_BUTTON> radioButtons(platforms.size());
+	vector<TASKDIALOG_BUTTON> radioButtons;
+	radioButtons.reserve(platforms.size() + 1);
 	for (const auto& [key, platform] : platforms) {
 		radioButtons.push_back(TASKDIALOG_BUTTON{key, platform.name.c_str()});
 	}
@@ -117,10 +119,16 @@ void askForAction(
 	tdc.pszFooter = wFooter.c_str();
 	// tdc.pszFooterIcon = TD_INFORMATION_ICON;
 	// ReSharper disable once CppParameterNeverUsed
-	tdc.pfCallback = [](HWND hwnd, const UINT msg, WPARAM wParam, const LPARAM lParam, LONG_PTR lpRefData)-> HRESULT {
+	tdc.pfCallback = [](HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LONG_PTR lpRefData)-> HRESULT {
 		if (msg == TDN_HYPERLINK_CLICKED) {
-			 // NOLINT(performance-no-int-to-ptr)
-			ShellExecute(nullptr, L"open", reinterpret_cast<LPCWSTR>(lParam), nullptr, nullptr, SW_SHOWNORMAL);
+			ShellExecute(
+				nullptr,
+				L"open",
+				reinterpret_cast<LPCWSTR>(lParam), // NOLINT(performance-no-int-to-ptr)
+				nullptr,
+				nullptr,
+				SW_SHOWNORMAL
+			);
 		}
 
 		return S_OK;
