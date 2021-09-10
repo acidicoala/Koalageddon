@@ -126,8 +126,8 @@ void SteamClient::platformInit() {
 			installHooks();
 		} else {
 			showFatalError(
-				"Failed to initialize Steam platform since steamclient.dll patterns "
-				"were not found in cache could not be fetched online.",
+				"Failed to initialize Steam platform since steamclient-patterns.json "
+				"was not found in cache directory and could not be fetched from online source.",
 				false,
 				false
 			);
