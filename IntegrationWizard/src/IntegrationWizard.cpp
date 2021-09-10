@@ -1,19 +1,18 @@
 #include "pch.h"
 #include "IntegrationWizard.h"
 #include "Logger.h"
-#include "Config.h"
 
 using namespace IntegrationWizard;
 
 vector<wstring> IntegrationWizard::alteredPlatforms;
 
-void showPostActionReport(Action action)
+void showPostActionReport(const Action action)
 {
-	auto actionedString = action == Action::INSTALL_INTEGRATIONS ? "installed" : "removed";
+	const auto actionedString = action == Action::INSTALL_INTEGRATIONS ? "installed" : "removed";
 
 	if(alteredPlatforms.size() == 0)
 	{
-		auto message = fmt::format("No platforms integrations were {}", actionedString);
+		const auto message = fmt::format("No platforms integrations were {}", actionedString);
 		showInfo(message, "No result", true);
 	}
 	else
@@ -26,8 +25,8 @@ void showPostActionReport(Action action)
 		}
 
 		auto actionStr = action == Action::INSTALL_INTEGRATIONS ? "installed" : "removed";
-		auto message = fmt::format(
-			"The following platform integrations were sucessfully {}:\n\n{}",
+		const auto message = fmt::format(
+			"The following platform integrations were successfully {}:\n\n{}",
 			actionStr, targets
 		);
 		showInfo(message, "Success");
@@ -36,9 +35,9 @@ void showPostActionReport(Action action)
 
 void installIntegration(const PlatformInstallation& platform)
 {
-	auto integrationDLL = platform.architecture == Architecture::x32 ? INTEGRATION_32 : INTEGRATION_64;
-	auto integrationDllPath = getInstallDirPath() / integrationDLL;
-	auto versionDLLPath = platform.path / "version.dll";
+	const auto integrationDLL = platform.architecture == Architecture::x32 ? INTEGRATION_32 : INTEGRATION_64;
+	const auto integrationDllPath = getInstallDirPath() / integrationDLL;
+	const auto versionDLLPath = platform.path / "version.dll";
 	logger->debug(
 		"Integration DLL path: '{}', Destination: '{}'",
 		integrationDllPath.string(), versionDLLPath.string()
@@ -52,13 +51,13 @@ void installIntegration(const PlatformInstallation& platform)
 	// TODO: This code is temporary.
 	// It is meant to clean-up integration artifacts from previous versions.
 	// It needs to be remove after several releases.
-	auto originalDLLPath = platform.path / "version_o.dll";
+	const auto originalDLLPath = platform.path / "version_o.dll";
 	DeleteFile(originalDLLPath.c_str());
 }
 
 void removeIntegration(const PlatformInstallation& platform)
 {
-	auto versionDLLPath = platform.path / "version.dll";
+	const auto versionDLLPath = platform.path / "version.dll";
 	logger->debug("Version DLL path: '{}'",versionDLLPath.string());
 
 	// Terminate the process to release potential locks on files
@@ -70,11 +69,11 @@ void removeIntegration(const PlatformInstallation& platform)
 
 void safelyAlterPlatform(Action action, const PlatformInstallation& platform)
 {
-	auto actionString = action == Action::INSTALL_INTEGRATIONS ? "install" : "remove";
-	auto actioningString = action == Action::INSTALL_INTEGRATIONS ? "Installing" : "Removing";
-	auto actionedString = action == Action::INSTALL_INTEGRATIONS ? "installed" : "removed";
+	const auto actionString = action == Action::INSTALL_INTEGRATIONS ? "install" : "remove";
+	const auto actioningString = action == Action::INSTALL_INTEGRATIONS ? "Installing" : "Removing";
+	const auto actionedString = action == Action::INSTALL_INTEGRATIONS ? "installed" : "removed";
 
-	auto callback = action == Action::INSTALL_INTEGRATIONS ? installIntegration : removeIntegration;
+	const auto callback = action == Action::INSTALL_INTEGRATIONS ? installIntegration : removeIntegration;
 
 	try
 	{

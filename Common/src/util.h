@@ -83,7 +83,7 @@ cpr::Response fetch(string url, Ts&&... ts)
 {
 	return cpr::Get(
 		cpr::Url{ url },
-		cpr::Timeout{ 3 * 1000 }, // 3s
+		cpr::Timeout{ 1 * 1000 }, // 1s
 		cpr::VerifySsl{ false },
 		std::forward<Ts>(ts)...
 	);

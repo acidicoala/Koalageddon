@@ -8,7 +8,7 @@ protected:
 	
 	map<string, string> patterns;
 	
-	void fetchAndCachePatterns();
+	void fetchAndCachePatterns() const;
 	void readCachedPatterns();
 	void installHook(void* hookedFunc, string funcName);
 	void installHooks();
