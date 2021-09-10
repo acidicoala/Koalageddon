@@ -68,7 +68,7 @@ string readFileContents(path path);
 bool writeFileContents(path filePath, string contents);
 
 // Message Box helpers
-void showFatalError(string message, bool terminate);
+void showFatalError(string message, bool terminate, bool showLastError = true);
 void showInfo(string message, string title = "Information", bool shouldLog = false);
 
 template<typename T>

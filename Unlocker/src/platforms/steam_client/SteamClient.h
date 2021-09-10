@@ -7,8 +7,8 @@ protected:
 	const path PATTERNS_FILE_PATH = getCacheDirPath() / "steamclient-patterns.json";
 	
 	map<string, string> patterns;
-	
-	void fetchAndCachePatterns() const;
+
+	bool fetchAndCachePatterns() const;
 	void readCachedPatterns();
 	void installHook(void* hookedFunc, string funcName);
 	void installHooks();

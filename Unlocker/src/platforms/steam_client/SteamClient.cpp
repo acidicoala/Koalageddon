@@ -4,22 +4,28 @@
 #include "constants.h"
 #include "PatternMatcher.h"
 
-void SteamClient::fetchAndCachePatterns() const {
+bool SteamClient::fetchAndCachePatterns() const {
 	logger->debug("Fetching SteamClient patterns");
 
 	// Fetch offsets
 	const auto res = fetch(steamclient_patterns_url);
 
 	if (res.status_code != 200) {
-		logger->error("Failed to fetch SteamClient patterns: {} - {}", res.error.code, res.error.message);
-		return;
+		logger->error(
+			"Failed to fetch SteamClient patterns. ErrorCode: {}. StatusCode: {}. Message: {}",
+			res.error.code, res.status_code, res.error.message
+		);
+		return false;
 	}
 
 	// Cache offsets
-	if (writeFileContents(PATTERNS_FILE_PATH, res.text))
-		logger->info("SteamClient patterns were successfully fetched and cached");
-	else
+	if (!writeFileContents(PATTERNS_FILE_PATH, res.text)) {
 		logger->error("Failed to cache SteamClient patterns");
+		return false;
+	}
+
+	logger->info("SteamClient patterns were successfully fetched and cached");
+	return true;
 }
 
 void SteamClient::readCachedPatterns() {
@@ -101,18 +107,31 @@ void SteamClient::platformInit() {
 
 	// Execute blocking operations in a new thread
 	std::thread hooksThread([&] {
-		std::thread fetchingThread([&] { fetchAndCachePatterns(); });
+		std::thread fetchingThread([&] {
+			if (fetchAndCachePatterns()) {
+				readCachedPatterns();
+			}
+		});
 		readCachedPatterns();
 
 		if (patterns.empty()) {
 			// No cached patterns, hence we fetch them synchronously
 			fetchingThread.join();
-			readCachedPatterns();
 		} else {
 			// Patterns were cached, hence we fetch them asynchronously
 			fetchingThread.detach();
 		}
-		installHooks();
+
+		if (!patterns.empty()) {
+			installHooks();
+		} else {
+			showFatalError(
+				"Failed to initialize Steam platform since steamclient.dll patterns "
+				"were not found in cache could not be fetched online.",
+				false,
+				false
+			);
+		}
 	});
 	hooksThread.detach();
 

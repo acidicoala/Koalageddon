@@ -282,14 +282,22 @@ bool writeFileContents(path filePath, string contents)
 	}
 }
 
-void showFatalError(string message, bool terminate)
+void showFatalError(string message, bool terminate, bool showLastError)
 {
-	message = fmt::format("{}\nLast error: 0x{:X}", message, GetLastError());
+	if(showLastError) {
+		message = fmt::format("{}\nLast error: 0x{:X}", message, GetLastError());
+	}
 	logger->error(message);
-	MessageBoxA(NULL, message.c_str(), "Fatal Error", MB_ICONERROR | MB_OK);
+	MessageBoxA(
+		nullptr, 
+		message.c_str(),
+		"[Koalageddon] Fatal Error",
+		MB_ICONERROR | MB_OK
+	);
 
-	if(terminate)
+	if(terminate) {
 		exit(1);
+	}
 }
 
 void showInfo(string message, string title, bool shouldLog)
